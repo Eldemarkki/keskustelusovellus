@@ -1,6 +1,7 @@
 import re
 from flask import Flask, redirect, render_template, request, session
 from argon2 import PasswordHasher
+from argon2.exceptions import VerificationError
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 import os
@@ -22,7 +23,6 @@ def index_page():
         return render_template("index.html", username=username)
 
     return render_template("index.html")
-
 
 @app.route("/register")
 def register_page():
@@ -59,3 +59,39 @@ def register_post():
         session["id"] = id
 
         return redirect("/")  
+
+@app.route("/login")
+def login_page():
+    return render_template("login.html")
+
+@app.post('/login')
+def login_post():
+    username = request.form.get('username', '')
+    password = request.form.get('password', '')
+
+    errors = []
+    if len(password) < 16 or len(password) > 64:
+        errors.append("Password must be 16-64 characters long.")
+
+    user = db.session.execute(text("SELECT id, password_hash FROM users WHERE username = :username"), {"username": username}).first()
+    if not user:
+        # TODO: This is bad, fix it. There's also a timing attack that needs to be fixed.
+        errors.append("User doesn't exist")
+
+    if len(errors) > 0:
+        return render_template("login.html", errors=errors)
+    else:
+        password_hash = user[1]
+
+        try:
+            hasher.verify(password_hash, password)
+            session["id"] = user[0]
+            return redirect("/")  
+        except VerificationError:
+            errors.append("Invalid username or password")
+            return render_template("login.html", errors=errors)
+
+@app.post("/logout")
+def logout_post():
+    del session["id"]
+    return redirect("/")

@@ -8,7 +8,11 @@
 <body>
     {% if username %}
     <p>Welcome back, {{ username }}</p>
+    <form method="post" action="/logout">
+        <input type="submit" value="Log out" />
+    </form>
     {% else %}
+    <a href="/login">Log in here</a>
     <a href="/register">Register here</a>
     {% endif %}
 </body>
