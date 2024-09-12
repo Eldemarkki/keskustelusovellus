@@ -33,7 +33,8 @@ def register_post():
         errors.append("Username must only have alphanumeric characters (a-z, A-Z, 0-9) and be 1-32 characters long")
     if len(password) < 16 or len(password) > 64:
         errors.append("Password must be 16-64 characters long.")
-    if False: # TODO: Check that username is not taken
+    username_exists = db.session.execute(text("SELECT COUNT(*) FROM users WHERE username = :username"), {"username": username}).first()[0] > 0
+    if username_exists:
         errors.append("Username is taken")
 
     if len(errors) > 0:
