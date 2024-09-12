@@ -1,23 +1,28 @@
 import re
-from flask import Flask, make_response, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, session
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
-import jwt
 from sqlalchemy.sql import text
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-JWT_SECRET = os.getenv("JWT_SECRET")
-
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:secretpassword@localhost:5432/postgres"
 hasher = PasswordHasher()
 db = SQLAlchemy(app)
 
 @app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+def index_page():
+    id = session.get("id", None)
+    if id != None:
+        username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": id}).first()[0]
+        
+        return render_template("index.html", username=username)
+
+    return render_template("index.html")
+
 
 @app.route("/register")
 def register_page():
@@ -51,8 +56,6 @@ def register_post():
 
         id = db.session.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).first()[0]
 
-        encoded = jwt.encode({"user_id": str(id)}, JWT_SECRET)
+        session["id"] = id
 
-        resp = make_response(redirect("/"))
-        resp.set_cookie('auth_token', encoded)
-        return resp  
+        return redirect("/")  
