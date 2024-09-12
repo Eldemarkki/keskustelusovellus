@@ -1,7 +1,13 @@
 import re
 from flask import Flask, redirect, render_template, request
+from argon2 import PasswordHasher
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:secretpassword@localhost:5432/postgres"
+hasher = PasswordHasher()
+db = SQLAlchemy(app)
 
 @app.route("/")
 def hello_world():
@@ -27,5 +33,14 @@ def register_post():
     if len(errors) > 0:
         return render_template("register.html", errors=errors)
     else:
+        password_hash = hasher.hash(password)
+
+        sql = text("INSERT INTO users (username, password_hash) VALUES (:username, :password_hash)")
+        db.session.execute(sql, {
+            "username": username, 
+            "password_hash": password_hash
+        })
+        db.session.commit()
+
         # TODO: Set cookie
         return redirect("/")
