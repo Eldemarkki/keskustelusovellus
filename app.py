@@ -70,26 +70,26 @@ def login_post():
     password = request.form.get('password', '')
 
     errors = []
-    if len(password) < 16 or len(password) > 64:
-        errors.append("Password must be 16-64 characters long.")
-
-    user = db.session.execute(text("SELECT id, password_hash FROM users WHERE username = :username"), {"username": username}).first()
-    if not user:
-        # TODO: This is bad, fix it. There's also a timing attack that needs to be fixed.
-        errors.append("User doesn't exist")
+    if len(password) > 64:
+        errors.append("Password must not be longer than 64 characters long.")
 
     if len(errors) > 0:
         return render_template("login.html", errors=errors)
-    else:
-        password_hash = user[1]
 
-        try:
+    user = db.session.execute(text("SELECT id, password_hash FROM users WHERE username = :username"), {"username": username}).first()
+
+    try:
+        if user != None:
+            password_hash = user[1]
             hasher.verify(password_hash, password)
             session["id"] = user[0]
             return redirect("/")  
-        except VerificationError:
-            errors.append("Invalid username or password")
-            return render_template("login.html", errors=errors)
+        else:
+            # Try to verify some garbage to prevent timing attacks.
+            password_hash = "$argon2id$v=19$m=65536,t=3,p=4$nQiaw9HH5UxmV44rZk7yMA$0wBr3cHpcfSqyZMQvYCsNv4ywkMxbgIUpS4+TtFmWQ4" # testing1234567890
+            hasher.verify(password_hash, "incorrect")
+    except VerificationError:
+        return render_template("login.html", errors=["Invalid username or password"])
 
 @app.post("/logout")
 def logout_post():

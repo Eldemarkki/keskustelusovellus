@@ -8,8 +8,8 @@
 <body>
     <p>Register</p>
     <form method="post" action="/register">
-        <input name="username" />
-        <input name="password" type="password" />
+        <input name="username" pattern="^[a-zA-Z0-9]{1,32}$" required />
+        <input name="password" type="password" minlength="16" maxlength="64" required />
         <input type="submit" value="Register" />
     </form>
     {% if errors and errors|length > 0 %}
