@@ -1,8 +1,14 @@
 import re
-from flask import Flask, redirect, render_template, request
+from flask import Flask, make_response, redirect, render_template, request
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
+import jwt
 from sqlalchemy.sql import text
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+JWT_SECRET = os.getenv("JWT_SECRET")
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:secretpassword@localhost:5432/postgres"
@@ -42,5 +48,10 @@ def register_post():
         })
         db.session.commit()
 
-        # TODO: Set cookie
-        return redirect("/")
+        id = db.session.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).first()[0]
+
+        encoded = jwt.encode({"user_id": str(id)}, JWT_SECRET)
+
+        resp = make_response(redirect("/"))
+        resp.set_cookie('auth_token', encoded)
+        return resp  
