@@ -10,7 +10,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:secretpassword@localhost:5432/postgres"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 hasher = PasswordHasher()
 db = SQLAlchemy(app)
 
