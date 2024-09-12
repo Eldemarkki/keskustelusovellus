@@ -18,10 +18,10 @@ db = SQLAlchemy(app)
 def index_page():
     id = session.get("id", None)
     if id != None:
-        username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": id}).first()[0]
-        
-        return render_template("index.html", username=username)
-
+        user = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": id}).first()
+        if user != None:
+            username = user[0]
+            return render_template("index.html", username=username)
     return render_template("index.html")
 
 @app.route("/register")
@@ -95,3 +95,40 @@ def login_post():
 def logout_post():
     del session["id"]
     return redirect("/")
+
+@app.route("/new-topic")
+def new_topic_route():
+    if "id" in session:
+        return render_template("/new_topic.html")
+    return redirect("/login")
+
+@app.post("/new-topic")
+def new_topic_post():
+    if "id" in session:
+        errors = []
+
+        name = request.form.get("name", "")
+        if not re.match("^[a-zA-Z0-9\\s]{1,100}$", name):
+            errors.append("Topic name must only have alphanumeric characters (a-z, A-Z, 0-9) and be 1-100 characters long.")
+
+        description = request.form.get("description", None)
+        if len(description) > 500:
+            errors.append("Description must not be longer than 500 characters")
+
+        if db.session.execute(text("SELECT COUNT(*) FROM topics WHERE name = :name"), {
+        "name": name
+        }).first()[0] > 0:
+            errors.append("A topic with this name already exists")
+
+        if len(errors) > 0:
+            return render_template("/new_topic.html", errors=errors)
+
+        db.session.execute(
+            text("INSERT INTO topics (name, description) VALUES (:name, :description)"),
+            {"name": name, "description": description}
+        )
+        db.session.commit()
+
+        return redirect("/topics/" + name)
+
+    return redirect("/login")
