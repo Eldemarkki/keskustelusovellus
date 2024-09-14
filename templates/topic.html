@@ -8,10 +8,13 @@
 </head>
 
 <body>
+    <a href="/">Front page</a>
+    <a href="/topics">Topics</a>
     <h1>{{ topic.name }}</h1>
     {% if topic.description and topic.description|length > 0 %}
     <p>{{ topic.description }}</p>
     {% endif %}
+    <a href="/topics/{{ topic.slug }}/new-thread">Create new thread</a>
     {% if threads|length > 0 %}
     <h2>Threads</h2>
     <ul>
