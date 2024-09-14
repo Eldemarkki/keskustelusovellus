@@ -219,6 +219,33 @@ def topics_route():
     topics = db.session.execute(text("SELECT name, slug, COUNT(threads.id) FROM topics LEFT JOIN threads ON topics.id = threads.topic_id GROUP BY topics.name, topics.slug;")).all()
     return render_template("topics.html", topics=topics)
 
+@app.route("/threads/<thread_id>")
+def thread_route(thread_id):
+    thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
+        "thread_id": thread_id
+    }).first()
+
+    if thread == None:
+        abort(404)
+        return
+
+    messages = db.session.execute(text(
+        """
+            SELECT 
+                messages.id,
+                messages.message,
+                messages.created_at,
+                users.username
+            FROM messages 
+            LEFT JOIN users ON messages.user_id = users.id
+            WHERE thread_id = :thread_id 
+            ORDER BY created_at DESC
+        """), {
+        "thread_id": thread_id
+    })
+
+    return render_template("thread.html", thread=thread, messages=messages)
+
 @app.errorhandler(404)
 def page_not_found(_):
     return render_template('404.html'), 404
