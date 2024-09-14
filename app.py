@@ -229,6 +229,10 @@ def thread_route(thread_id):
         abort(404)
         return
 
+    topic = db.session.execute(text("SELECT * FROM topics WHERE id = :id"), {
+        "id": thread.topic_id
+    }).first()
+
     messages = db.session.execute(text(
         """
             SELECT 
@@ -244,7 +248,33 @@ def thread_route(thread_id):
         "thread_id": thread_id
     })
 
-    return render_template("thread.html", thread=thread, messages=messages)
+    return render_template("thread.html", thread=thread, messages=messages, topic=topic)
+
+@app.post("/threads/<thread_id>")
+def thread_post(thread_id):
+    user_id = session.get("id")
+    if user_id == None:
+        return redirect("/login")
+    
+    exists = db.session.execute(text("SELECT COUNT(*) FROM threads WHERE id = :thread_id"), {
+        "thread_id": thread_id
+    }).first()[0] > 0
+
+    if not exists:
+        abort(404)
+        return
+
+    message = request.form.get("message", "")
+
+    db.session.execute(text("INSERT INTO messages (user_id, thread_id, message) VALUES (:user_id, :thread_id, :message)"), {
+        "user_id": user_id,
+        "thread_id": thread_id,
+        "message": message
+    })
+
+    db.session.commit()
+
+    return redirect("/threads/" + str(thread_id))
 
 @app.errorhandler(404)
 def page_not_found(_):
