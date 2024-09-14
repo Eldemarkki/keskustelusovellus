@@ -192,6 +192,11 @@ def new_thread_post(topic_slug):
         return redirect("/threads/" + str(thread_id))
     return redirect("/login")
 
+@app.route("/topics")
+def topics_route():
+    topics = db.session.execute(text("SELECT topic_id, name, slug, COUNT(*) FROM threads LEFT JOIN topics ON threads.topic_id = topics.id GROUP BY topic_id, name, slug")).all()
+    return render_template("topics.html", topics=topics)
+
 @app.errorhandler(404)
 def page_not_found(_):
     return render_template('404.html'), 404

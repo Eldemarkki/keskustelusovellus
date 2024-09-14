@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics</title>
+</head>
+<body>
+    <h1>Topics</h1>
+    <a href="/new-topic">Create new topic</a>
+    {% if topics|length > 0 %}
+    <ul>
+        {% for topic in topics %}
+            <li>
+                <a href="/topics/{{ topic.slug }}">{{ topic.name }} ({{ topic.count }} {{ "thread" if topic.count == 1 else "threads" }})</a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No topics created yet</p>
+    {% endif %}
+</body>
+</html>
