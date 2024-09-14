@@ -147,6 +147,7 @@ def topic_page(topic_slug):
             """
             SELECT 
                 threads.id, 
+                threads.private,
                 title, 
                 COUNT(messages.id) 
             FROM 

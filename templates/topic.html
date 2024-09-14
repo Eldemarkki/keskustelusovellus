@@ -20,6 +20,9 @@
     <ul>
         {% for thread in threads %}
         <li>
+            {% if thread.private %}
+            <img src="/static/lock.svg" width="20" height="20"/>
+            {% endif %}
             <a href="/threads/{{ thread.id }}">{{ thread.title }} ({{ thread.count }} {{ "message" if thread.count == 1 else "messages" }})</a>
         </li>
         {% endfor %}
