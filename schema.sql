@@ -7,6 +7,7 @@ CREATE TABLE users (
 CREATE TABLE topics (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
+    slug TEXT GENERATED ALWAYS AS (replace(lower(name), ' ', '-')) STORED,
     description TEXT
 );
 

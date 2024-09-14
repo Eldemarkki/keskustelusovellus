@@ -1,5 +1,5 @@
 import re
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, abort, redirect, render_template, request, session
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from flask_sqlalchemy import SQLAlchemy
@@ -108,15 +108,18 @@ def new_topic_post():
         errors = []
 
         name = request.form.get("name", "")
-        if not re.match("^[a-zA-Z0-9\\s]{1,100}$", name):
-            errors.append("Topic name must only have alphanumeric characters (a-z, A-Z, 0-9) and be 1-100 characters long.")
+        if not re.match("^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$", name):
+            errors.append("Topic name must only have alphanumeric characters (a-z, A-Z, 0-9) and no consecutive spaces.")
+        
+        if len(name) <= 0 or len(name) > 100:
+            errors.append("Topic name must be 1-100 characters long.")
 
         description = request.form.get("description", None)
         if len(description) > 500:
             errors.append("Description must not be longer than 500 characters")
 
         if db.session.execute(text("SELECT COUNT(*) FROM topics WHERE name = :name"), {
-        "name": name
+            "name": name
         }).first()[0] > 0:
             errors.append("A topic with this name already exists")
 
@@ -132,3 +135,19 @@ def new_topic_post():
         return redirect("/topics/" + name)
 
     return redirect("/login")
+
+@app.route("/topics/<topic_slug>")
+def topic_page(topic_slug):
+    if topic_slug != None:
+        topic = db.session.execute(text("SELECT * FROM topics WHERE slug = :slug"), {
+            "slug": topic_slug
+        }).first()
+
+        if topic != None:
+            return render_template("topic.html", topic=topic)
+    
+    abort(404)
+
+@app.errorhandler(404)
+def page_not_found(_):
+    return render_template('404.html'), 404
