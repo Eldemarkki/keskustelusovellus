@@ -141,8 +141,30 @@ def topic_page(topic_slug):
             "slug": topic_slug
         }).first()
 
+        threads = db.session.execute(text(
+            """
+            SELECT 
+                threads.id, 
+                title, 
+                COUNT(messages.id) 
+            FROM 
+                threads 
+            LEFT JOIN 
+                messages 
+            ON 
+                threads.id = messages.thread_id 
+            WHERE 
+                topic_id = :topic_id 
+            GROUP BY 
+                threads.id
+            ORDER BY 
+                threads.created_at DESC;
+            """), {
+            "topic_id": topic.id
+        }).all()
+
         if topic != None:
-            return render_template("topic.html", topic=topic)
+            return render_template("topic.html", topic=topic, threads=threads)
     
     abort(404)
 
@@ -194,7 +216,7 @@ def new_thread_post(topic_slug):
 
 @app.route("/topics")
 def topics_route():
-    topics = db.session.execute(text("SELECT topic_id, name, slug, COUNT(*) FROM threads LEFT JOIN topics ON threads.topic_id = topics.id GROUP BY topic_id, name, slug")).all()
+    topics = db.session.execute(text("SELECT name, slug, COUNT(threads.id) FROM topics LEFT JOIN threads ON topics.id = threads.topic_id GROUP BY topics.name, topics.slug;")).all()
     return render_template("topics.html", topics=topics)
 
 @app.errorhandler(404)
