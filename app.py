@@ -47,14 +47,12 @@ def register_post():
     else:
         password_hash = hasher.hash(password)
 
-        sql = text("INSERT INTO users (username, password_hash) VALUES (:username, :password_hash)")
-        db.session.execute(sql, {
+        id = db.session.execute(text("INSERT INTO users (username, password_hash) VALUES (:username, :password_hash) RETURNING id"), {
             "username": username, 
             "password_hash": password_hash
-        })
-        db.session.commit()
+        }).first()[0]
 
-        id = db.session.execute(text("SELECT id FROM users WHERE username = :username"), {"username": username}).first()[0]
+        db.session.commit()
 
         session["id"] = id
 
@@ -126,13 +124,13 @@ def new_topic_post():
         if len(errors) > 0:
             return render_template("/new_topic.html", errors=errors)
 
-        db.session.execute(
-            text("INSERT INTO topics (name, description) VALUES (:name, :description)"),
+        topic = db.session.execute(
+            text("INSERT INTO topics (name, description) VALUES (:name, :description) RETURNING slug"),
             {"name": name, "description": description}
-        )
+        ).first()
         db.session.commit()
 
-        return redirect("/topics/" + name)
+        return redirect("/topics/" + topic[0])
 
     return redirect("/login")
 
@@ -147,6 +145,52 @@ def topic_page(topic_slug):
             return render_template("topic.html", topic=topic)
     
     abort(404)
+
+@app.route("/topics/<topic_slug>/new-thread")
+def new_thread_page(topic_slug):
+    if "id" in session:
+        topic = db.session.execute(text("SELECT * FROM topics WHERE slug = :slug"), {
+            "slug": topic_slug
+        }).first()
+
+        if topic == None:
+            abort(404)
+            return
+
+        return render_template("/new_thread.html", topic=topic)
+    return redirect("/login")
+
+@app.post("/topics/<topic_slug>/new-thread")
+def new_thread_post(topic_slug):
+    if "id" in session:
+        user_id = session.get("id")
+        title = request.form.get("title", "")
+        private = request.form.get("private", False, type=bool)
+        message = request.form.get("message", "")
+        topic = db.session.execute(text("SELECT * FROM topics WHERE slug = :slug"), {
+            "slug": topic_slug
+        }).first()
+
+        if topic == None:
+            abort(404)
+            return
+
+        thread_id = db.session.execute(text("INSERT INTO threads (title, private, topic_id) VALUES (:title, :private, :topic_id) RETURNING id"), {
+            "title": title,
+            "private": private,
+            "topic_id": topic.id
+        }).first()[0]
+
+        db.session.execute(text("INSERT INTO messages (user_id, thread_id, message) VALUES (:user_id, :thread_id, :message)"), {
+            "user_id": user_id,
+            "thread_id": thread_id,
+            "message": message  
+        })
+
+        db.session.commit()
+
+        return redirect("/threads/" + str(thread_id))
+    return redirect("/login")
 
 @app.errorhandler(404)
 def page_not_found(_):

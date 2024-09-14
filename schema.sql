@@ -13,6 +13,7 @@ CREATE TABLE topics (
 
 CREATE TABLE threads (
     id SERIAL PRIMARY KEY,
+    topic_id INT NOT NULL REFERENCES topics(id),
     title TEXT NOT NULL,
     private BOOLEAN NOT NULL
 );
@@ -20,7 +21,8 @@ CREATE TABLE threads (
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id),
-    message_id TEXT NOT NULL
+    thread_id INT NOT NULL REFERENCES threads(id),
+    message TEXT NOT NULL
 );
 
 CREATE TABLE private_thread_participant_rights (
