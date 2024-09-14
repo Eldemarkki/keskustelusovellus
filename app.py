@@ -136,6 +136,8 @@ def new_topic_post():
 
 @app.route("/topics/<topic_slug>")
 def topic_page(topic_slug):
+    user_id = session.get("id")
+
     if topic_slug != None:
         topic = db.session.execute(text("SELECT * FROM topics WHERE slug = :slug"), {
             "slug": topic_slug
@@ -149,18 +151,21 @@ def topic_page(topic_slug):
                 COUNT(messages.id) 
             FROM 
                 threads 
-            LEFT JOIN 
-                messages 
-            ON 
-                threads.id = messages.thread_id 
+            LEFT JOIN messages ON threads.id = messages.thread_id 
+            LEFT JOIN private_thread_participant_rights ON threads.id = private_thread_participant_rights.thread_id
             WHERE 
-                topic_id = :topic_id 
+                topic_id = :topic_id AND
+                    (
+                        private = false OR 
+                        private_thread_participant_rights.user_id = :user_id
+                    )
             GROUP BY 
                 threads.id
             ORDER BY 
                 threads.created_at DESC;
             """), {
-            "topic_id": topic.id
+            "topic_id": topic.id,
+            "user_id": user_id
         }).all()
 
         if topic != None:
@@ -209,6 +214,11 @@ def new_thread_post(topic_slug):
             "message": message  
         })
 
+        db.session.execute(text("INSERT INTO private_thread_participant_rights (user_id, thread_id) VALUES (:user_id, :thread_id)"), {
+            "user_id": user_id,
+            "thread_id": thread_id
+        })
+
         db.session.commit()
 
         return redirect("/threads/" + str(thread_id))
@@ -216,7 +226,20 @@ def new_thread_post(topic_slug):
 
 @app.route("/topics")
 def topics_route():
-    topics = db.session.execute(text("SELECT name, slug, COUNT(threads.id) FROM topics LEFT JOIN threads ON topics.id = threads.topic_id GROUP BY topics.name, topics.slug;")).all()
+    user_id = session.get("id")
+    
+    topics = db.session.execute(text(
+        """
+            SELECT name, slug, COUNT(threads.id) 
+            FROM topics 
+            LEFT JOIN threads ON topics.id = threads.topic_id 
+            LEFT JOIN private_thread_participant_rights ON threads.id = private_thread_participant_rights.thread_id
+            WHERE private = false OR private_thread_participant_rights.user_id = :user_id
+            GROUP BY topics.name, topics.slug;
+        """), {
+        "user_id": user_id
+    }).all()
+
     return render_template("topics.html", topics=topics)
 
 @app.route("/threads/<thread_id>")
@@ -228,6 +251,16 @@ def thread_route(thread_id):
     if thread == None:
         abort(404)
         return
+    
+    if thread.private:
+        user_id = session.get("id")
+        access = db.session.execute(text("SELECT * FROM private_thread_participant_rights WHERE thread_id = :thread_id AND user_id = :user_id"), {
+            "thread_id": thread_id,
+            "user_id": user_id
+        }).first()
+        if access == None:
+            abort(404)
+            return
 
     topic = db.session.execute(text("SELECT * FROM topics WHERE id = :id"), {
         "id": thread.topic_id
@@ -261,6 +294,15 @@ def thread_post(thread_id):
     }).first()[0] > 0
 
     if not exists:
+        abort(404)
+        return
+    
+    access = db.session.execute(text("SELECT * FROM private_thread_participant_rights WHERE thread_id = :thread_id AND user_id = :user_id"), {
+        "thread_id": thread_id,
+        "user_id": user_id
+    }).first()
+
+    if access == None:
         abort(404)
         return
 
