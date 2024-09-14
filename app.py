@@ -289,22 +289,23 @@ def thread_post(thread_id):
     if user_id == None:
         return redirect("/login")
     
-    exists = db.session.execute(text("SELECT COUNT(*) FROM threads WHERE id = :thread_id"), {
+    thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
         "thread_id": thread_id
-    }).first()[0] > 0
+    }).first()
 
-    if not exists:
+    if thread == None:
         abort(404)
         return
     
-    access = db.session.execute(text("SELECT * FROM private_thread_participant_rights WHERE thread_id = :thread_id AND user_id = :user_id"), {
-        "thread_id": thread_id,
-        "user_id": user_id
-    }).first()
+    if thread.private:
+        access = db.session.execute(text("SELECT * FROM private_thread_participant_rights WHERE thread_id = :thread_id AND user_id = :user_id"), {
+            "thread_id": thread_id,
+            "user_id": user_id
+        }).first()
 
-    if access == None:
-        abort(404)
-        return
+        if access == None:
+            abort(404)
+            return
 
     message = request.form.get("message", "")
 
