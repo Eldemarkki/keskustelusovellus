@@ -6,14 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ thread.title }}</title>
     <style>
-        form {
+        textarea {
+            resize: vertical;
+        }
+
+        h1 {
+            margin: 0
+        }
+
+        .new-participant-form {
             display: flex;
             flex-direction: column;
             max-width: 30rem;
         }
 
-        textarea {
-            resize: vertical;
+        .message-form {
+            display: flex;
+            flex-direction: column;
+            max-width: 30rem;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            margin-block: 1rem;
+        }
+
+        .private-participant-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+        }
+
+        .private-participant-list {
+            max-width: 30rem;
+            padding: 0;
         }
     </style>
 </head>
@@ -21,8 +47,42 @@
 <body>
     <a href="/">Front page</a>
     <a href="/topics/{{ topic.slug }}">Browse {{ topic.name }}</a>
-    <h1>{{ thread.title }}</h1>
-    <form action="/threads/{{ thread.id }}" method="post">
+    <div class="title">
+        {% if thread.private %}
+        <img src="/static/lock.svg" width="32" height="32" />
+        {% endif %}
+        <h1>{{ thread.title }}</h1>
+    </div>
+    {% if thread.private and show_participant_list %}
+    <details 
+        {% if is_participants_open %}open=''{% endif %}
+    >
+        <summary>Private thread participants</summary>
+        <h2>Add new participant</h2>
+        {% if error and error|length > 0 %}
+        <p>{{ error }}</p>
+        {% endif %}
+        <form action="/threads/{{ thread.id }}/add-participant" method="post" class="new-participant-form">
+            <label for="participant-username">Participant username</label>
+            <input type="text" name="participant-username" autocomplete="off" />
+            <input type="submit" value="Add participant" />
+        </form>
+        <ul class="private-participant-list">
+            {% for participant in private_participants %}
+            <li class="private-participant-row">
+                <span>{{ participant.username }}</span>
+                <form action="/threads/{{ thread.id }}/remove-participant" method="post">
+                    <input type="hidden" name="participant-id" value="{{ participant.user_id }}" />
+                    <input type="submit" value="Remove" />
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        <hr />
+    </details>
+    {% endif %}
+    <h2>New message</h2>
+    <form action="/threads/{{ thread.id }}" method="post" class="message-form">
         <label for="message">Message</label>
         <textarea name="message"></textarea>
         <input type="submit" value="Send message" />

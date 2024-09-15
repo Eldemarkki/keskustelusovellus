@@ -243,8 +243,7 @@ def topics_route():
 
     return render_template("topics.html", topics=topics)
 
-@app.route("/threads/<thread_id>")
-def thread_route(thread_id):
+def render_thread_page(thread_id, error=None, is_participants_open=False):
     thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
         "thread_id": thread_id
     }).first()
@@ -282,7 +281,38 @@ def thread_route(thread_id):
         "thread_id": thread_id
     })
 
-    return render_template("thread.html", thread=thread, messages=messages, topic=topic)
+    # Thread owner is whoever sent the first message to this thread
+    thread_owner = db.session.execute(text("SELECT user_id FROM messages WHERE thread_id = :thread_id ORDER BY created_at DESC LIMIT 1"), {
+        "thread_id": thread_id
+    }).first()[0]
+
+    show_participant_list = thread_owner == user_id
+
+    private_thread_participants = db.session.execute(text(
+        """
+            SELECT user_id, username 
+            FROM private_thread_participant_rights 
+            LEFT JOIN users ON private_thread_participant_rights.user_id = users.id
+            WHERE thread_id = :thread_id AND user_id != :owner_user_id
+        """), {
+        "thread_id": thread_id,
+        "owner_user_id": user_id
+    })
+
+    return render_template(
+        "thread.html", 
+        thread=thread, 
+        messages=messages, 
+        topic=topic, 
+        private_participants=private_thread_participants,
+        is_participants_open=is_participants_open,
+        show_participant_list=show_participant_list,
+        error=error
+    )
+
+@app.route("/threads/<thread_id>")
+def thread_route(thread_id):
+    return render_thread_page(thread_id)
 
 @app.post("/threads/<thread_id>")
 def thread_post(thread_id):
@@ -319,6 +349,90 @@ def thread_post(thread_id):
     db.session.commit()
 
     return redirect("/threads/" + str(thread_id))
+
+@app.post("/threads/<thread_id>/add-participant")
+def add_participant_post(thread_id):
+    user_id = session.get("id")
+    if user_id == None:
+        return redirect("/login")
+    
+    thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
+        "thread_id": thread_id
+    }).first()
+
+    if thread == None:
+        print("thread not found")
+        abort(404)
+        return
+
+    if not thread.private:
+        abort(403)
+        return
+    
+    # Thread owner is whoever sent the first message to this thread
+    thread_owner = db.session.execute(text("SELECT user_id FROM messages WHERE thread_id = :thread_id ORDER BY created_at DESC LIMIT 1"), {
+        "thread_id": thread_id
+    }).first()[0]
+
+    if thread_owner != user_id:
+        return redirect("/login")
+
+    username = request.form.get("participant-username")
+
+    new_participant = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {
+        "username": username
+    }).first()
+
+    if new_participant == None:
+        return render_thread_page(thread_id=thread_id, error="User not found", is_participants_open=True)
+    
+    db.session.execute(text("INSERT INTO private_thread_participant_rights (user_id, thread_id) VALUES (:user_id, :thread_id)"), {
+        "user_id": new_participant.id,
+        "thread_id": thread_id
+    })
+
+    db.session.commit()
+
+    return render_thread_page(thread_id=thread_id, is_participants_open=True)
+
+@app.post("/threads/<thread_id>/remove-participant")
+def remove_participant_post(thread_id):
+    user_id = session.get("id")
+    if user_id == None:
+        return redirect("/login")
+    
+    thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
+        "thread_id": thread_id
+    }).first()
+
+    if thread == None:
+        print("thread not found")
+        abort(404)
+        return
+
+    if not thread.private:
+        abort(403)
+        return
+    
+    # Thread owner is whoever sent the first message to this thread
+    thread_owner = db.session.execute(text("SELECT user_id FROM messages WHERE thread_id = :thread_id ORDER BY created_at DESC LIMIT 1"), {
+        "thread_id": thread_id
+    }).first()[0]
+
+    if thread_owner != user_id:
+        return redirect("/login")
+
+    participant_id = request.form.get("participant-id", type=int)
+    
+    print(participant_id)
+    db.session.execute(text("DELETE FROM private_thread_participant_rights WHERE user_id = :user_id AND thread_id = :thread_id"), {
+        "user_id": participant_id,
+        "thread_id": thread_id
+    })
+
+    db.session.commit()
+
+    return render_thread_page(thread_id=thread_id, is_participants_open=True)
 
 @app.errorhandler(404)
 def page_not_found(_):
