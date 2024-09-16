@@ -1,10 +1,10 @@
 import re
+import os
 from flask import Flask, abort, redirect, render_template, request, session
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -16,10 +16,10 @@ db = SQLAlchemy(app)
 
 @app.route("/")
 def index_page():
-    id = session.get("id", None)
-    if id != None:
-        user = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": id}).first()
-        if user != None:
+    user_id = session.get("id")
+    if user_id is not None:
+        user = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).first()
+        if user is not None:
             username = user[0]
             return render_template("index.html", username=username)
     return render_template("index.html")
@@ -47,14 +47,14 @@ def register_post():
     else:
         password_hash = hasher.hash(password)
 
-        id = db.session.execute(text("INSERT INTO users (username, password_hash) VALUES (:username, :password_hash) RETURNING id"), {
+        user_id = db.session.execute(text("INSERT INTO users (username, password_hash) VALUES (:username, :password_hash) RETURNING id"), {
             "username": username, 
             "password_hash": password_hash
         }).first()[0]
 
         db.session.commit()
 
-        session["id"] = id
+        session["id"] = user_id
 
         return redirect("/")  
 
@@ -77,11 +77,11 @@ def login_post():
     user = db.session.execute(text("SELECT id, password_hash FROM users WHERE username = :username"), {"username": username}).first()
 
     try:
-        if user != None:
+        if user is not None:
             password_hash = user[1]
             hasher.verify(password_hash, password)
             session["id"] = user[0]
-            return redirect("/")  
+            return redirect("/")
         else:
             # Try to verify some garbage to prevent timing attacks.
             password_hash = "$argon2id$v=19$m=65536,t=3,p=4$nQiaw9HH5UxmV44rZk7yMA$0wBr3cHpcfSqyZMQvYCsNv4ywkMxbgIUpS4+TtFmWQ4" # testing1234567890
@@ -138,7 +138,7 @@ def new_topic_post():
 def topic_page(topic_slug):
     user_id = session.get("id")
 
-    if topic_slug != None:
+    if topic_slug is not None:
         topic = db.session.execute(text("SELECT * FROM topics WHERE slug = :slug"), {
             "slug": topic_slug
         }).first()
@@ -169,7 +169,7 @@ def topic_page(topic_slug):
             "user_id": user_id
         }).all()
 
-        if topic != None:
+        if topic is not None:
             return render_template("topic.html", topic=topic, threads=threads)
     
     abort(404)
@@ -181,7 +181,7 @@ def new_thread_page(topic_slug):
             "slug": topic_slug
         }).first()
 
-        if topic == None:
+        if topic is None:
             abort(404)
             return
 
@@ -199,7 +199,7 @@ def new_thread_post(topic_slug):
             "slug": topic_slug
         }).first()
 
-        if topic == None:
+        if topic is None:
             abort(404)
             return
 
@@ -248,17 +248,17 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
         "thread_id": thread_id
     }).first()
 
-    if thread == None:
+    if thread is None:
         abort(404)
         return
     
+    user_id = session.get("id")
     if thread.private:
-        user_id = session.get("id")
         access = db.session.execute(text("SELECT * FROM private_thread_participant_rights WHERE thread_id = :thread_id AND user_id = :user_id"), {
             "thread_id": thread_id,
             "user_id": user_id
         }).first()
-        if access == None:
+        if access is None:
             abort(404)
             return
 
@@ -301,9 +301,9 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
 
     return render_template(
         "thread.html", 
-        thread=thread, 
-        messages=messages, 
-        topic=topic, 
+        thread=thread,
+        messages=messages,
+        topic=topic,
         private_participants=private_thread_participants,
         is_participants_open=is_participants_open,
         show_participant_list=show_participant_list,
@@ -317,14 +317,14 @@ def thread_route(thread_id):
 @app.post("/threads/<thread_id>")
 def thread_post(thread_id):
     user_id = session.get("id")
-    if user_id == None:
+    if user_id is None:
         return redirect("/login")
     
     thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
         "thread_id": thread_id
     }).first()
 
-    if thread == None:
+    if thread is None:
         abort(404)
         return
     
@@ -334,7 +334,7 @@ def thread_post(thread_id):
             "user_id": user_id
         }).first()
 
-        if access == None:
+        if access is None:
             abort(404)
             return
 
@@ -353,14 +353,14 @@ def thread_post(thread_id):
 @app.post("/threads/<thread_id>/add-participant")
 def add_participant_post(thread_id):
     user_id = session.get("id")
-    if user_id == None:
+    if user_id is None:
         return redirect("/login")
     
     thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
         "thread_id": thread_id
     }).first()
 
-    if thread == None:
+    if thread is None:
         print("thread not found")
         abort(404)
         return
@@ -383,7 +383,7 @@ def add_participant_post(thread_id):
         "username": username
     }).first()
 
-    if new_participant == None:
+    if new_participant is None:
         return render_thread_page(thread_id=thread_id, error="User not found", is_participants_open=True)
     
     db.session.execute(text("INSERT INTO private_thread_participant_rights (user_id, thread_id) VALUES (:user_id, :thread_id)"), {
@@ -398,14 +398,14 @@ def add_participant_post(thread_id):
 @app.post("/threads/<thread_id>/remove-participant")
 def remove_participant_post(thread_id):
     user_id = session.get("id")
-    if user_id == None:
+    if user_id is None:
         return redirect("/login")
     
     thread = db.session.execute(text("SELECT * FROM threads WHERE id = :thread_id"), {
         "thread_id": thread_id
     }).first()
 
-    if thread == None:
+    if thread is None:
         print("thread not found")
         abort(404)
         return
