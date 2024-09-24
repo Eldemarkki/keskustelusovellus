@@ -34,11 +34,15 @@ def get_topic_by_slug(slug):
 def get_topics(user_id):
     topics = db.session.execute(text(
         """
-        SELECT name, slug, COUNT(threads.id) 
+        SELECT name, slug, COUNT(
+                CASE
+                    WHEN private = false OR private_thread_participant_rights.user_id = :user_id 
+                    THEN threads.id
+                END
+            )
         FROM topics 
         LEFT JOIN threads ON topics.id = threads.topic_id 
         LEFT JOIN private_thread_participant_rights ON threads.id = private_thread_participant_rights.thread_id
-        WHERE private = false OR private_thread_participant_rights.user_id = :user_id
         GROUP BY topics.name, topics.slug;
         """),
         {
