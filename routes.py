@@ -58,7 +58,7 @@ def login_post():
 
     errors = []
     if len(password) > 64:
-        errors.append("Password must not be longer than 64 characters long.")
+        errors.append("Salasana ei voi olla pidempi kuin 64 merkkiä.")
 
     if len(errors) > 0:
         return render_template("login.html", errors=errors)
@@ -75,7 +75,7 @@ def login_post():
             password_hash = "$argon2id$v=19$m=65536,t=3,p=4$nQiaw9HH5UxmV44rZk7yMA$0wBr3cHpcfSqyZMQvYCsNv4ywkMxbgIUpS4+TtFmWQ4" # testing1234567890
             hasher.verify(password_hash, "incorrect")
     except VerificationError:
-        return render_template("login.html", errors=["Invalid username or password"])
+        return render_template("login.html", errors=["Virheellinen käyttäjänimi tai salasana"])
 
 @app.post("/logout")
 def logout_post():
