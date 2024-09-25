@@ -38,5 +38,8 @@ CREATE TABLE private_thread_participant_rights (
 CREATE TABLE thread_followers (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id),
-    thread_id INT NOT NULL REFERENCES threads(id)
+    thread_id INT NOT NULL REFERENCES threads(id),
+    read_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE (user_id, thread_id)
 );

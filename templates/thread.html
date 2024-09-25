@@ -81,6 +81,15 @@
         <hr />
     </details>
     {% endif %}
+    {% if follows_thread %}
+    <form action="/threads/{{ thread.id }}/unfollow" method="post">
+        <input type="submit" value="Lopeta ketjun seuraaminen" />
+    </form>
+    {% else %}
+    <form action="/threads/{{ thread.id }}/follow" method="post">
+        <input type="submit" value="Seuraa ketjua" />
+    </form>
+    {% endif %}
     <h2>New message</h2>
     <form action="/threads/{{ thread.id }}" method="post" class="message-form">
         <label for="message">Message</label>

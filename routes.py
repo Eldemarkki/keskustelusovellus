@@ -5,6 +5,7 @@ from flask import abort, redirect, render_template, request, session
 from app import app
 from messages import create_message, get_thread_messages
 from private_thread_participant_rights import add_access_to_private_thread, get_private_thread_participants, has_access_to_private_thread, remove_access_to_private_thread
+from thread_followers import check_follows_thread, follow_thread, unfollow_thread
 from threads import create_thread, get_thread_by_id, get_thread_owner_id, get_topic_threads
 from topics import create_topic, get_topic_by_id, get_topic_by_slug, get_topics, topic_exists
 from users import create_user, get_user_by_id, get_user_by_username, user_exists
@@ -190,6 +191,8 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
     show_participant_list = thread_owner == user_id
     private_thread_participants = get_private_thread_participants(thread.id, user_id)
 
+    follows_thread = check_follows_thread(thread.id, user_id)
+
     return render_template(
         "thread.html", 
         thread=thread,
@@ -198,7 +201,8 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
         private_participants=private_thread_participants,
         is_participants_open=is_participants_open,
         show_participant_list=show_participant_list,
-        error=error
+        error=error,
+        follows_thread=follows_thread
     )
 
 @app.route("/threads/<thread_id>")
@@ -285,6 +289,50 @@ def remove_participant_post(thread_id):
     remove_access_to_private_thread(thread_id, participant_id)
 
     return render_thread_page(thread_id=thread_id, is_participants_open=True)
+
+@app.post("/threads/<thread_id>/follow")
+def follow_thread_post(thread_id):
+    user_id = session.get("id")
+    if user_id is None:
+        return redirect("/login")
+
+    thread = get_thread_by_id(thread_id)
+    if thread is None:
+        print("thread not found")
+        abort(404)
+        return
+    
+    user_id = session.get("id")
+    if thread.private and not has_access_to_private_thread(thread.id, user_id):
+        abort(404)
+        return
+
+    if not check_follows_thread(thread.id, user_id):
+        follow_thread(thread.id, user_id)
+
+    return redirect("/threads/" + str(thread.id))
+
+@app.post("/threads/<thread_id>/unfollow")
+def unfollow_thread_post(thread_id):
+    user_id = session.get("id")
+    if user_id is None:
+        return redirect("/login")
+
+    thread = get_thread_by_id(thread_id)
+    if thread is None:
+        print("thread not found")
+        abort(404)
+        return
+    
+    user_id = session.get("id")
+    if thread.private and not has_access_to_private_thread(thread.id, user_id):
+        abort(404)
+        return
+
+    if check_follows_thread(thread.id, user_id):
+        unfollow_thread(thread.id, user_id)
+
+    return redirect("/threads/" + str(thread.id))
 
 @app.errorhandler(404)
 def page_not_found(_):
