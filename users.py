@@ -1,5 +1,6 @@
-from db import db
 from sqlalchemy.sql import text
+from db import db
+
 
 def get_user_by_id(user_id: int):
     user = db.session.execute(text(
@@ -10,9 +11,10 @@ def get_user_by_id(user_id: int):
         """),
         {
             "id": user_id
-        }).first()
-    
+    }).first()
+
     return user
+
 
 def get_user_by_username(username: str):
     user = db.session.execute(text(
@@ -23,8 +25,9 @@ def get_user_by_username(username: str):
         """),
         {
             "username": username
-        }).first()
+    }).first()
     return user
+
 
 def user_exists(username: str) -> bool:
     username_exists = db.session.execute(text(
@@ -35,8 +38,9 @@ def user_exists(username: str) -> bool:
         """),
         {
             "username": username
-        }).first()[0] > 0
+    }).first()[0] > 0
     return username_exists
+
 
 def create_user(username: str, password_hash: str) -> int:
     user_id = db.session.execute(text(
@@ -46,11 +50,10 @@ def create_user(username: str, password_hash: str) -> int:
         RETURNING id
         """),
         {
-            "username": username, 
+            "username": username,
             "password_hash": password_hash
-        }).first()[0]
+    }).first()[0]
 
     db.session.commit()
 
     return user_id
-

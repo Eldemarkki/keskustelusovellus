@@ -1,5 +1,6 @@
-from db import db
 from sqlalchemy.sql import text
+from db import db
+
 
 def follow_thread(thread_id: int, user_id: int):
     db.session.execute(text(
@@ -8,8 +9,9 @@ def follow_thread(thread_id: int, user_id: int):
         """), {
             "thread_id": thread_id,
             "user_id": user_id,
-        })
+    })
     db.session.commit()
+
 
 def unfollow_thread(thread_id: int, user_id: int):
     db.session.execute(text(
@@ -18,8 +20,9 @@ def unfollow_thread(thread_id: int, user_id: int):
         """), {
             "thread_id": thread_id,
             "user_id": user_id,
-        })
+    })
     db.session.commit()
+
 
 def check_follows_thread(thread_id: int, user_id: int):
     follows = db.session.execute(text(

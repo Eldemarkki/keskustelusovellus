@@ -1,5 +1,6 @@
-from db import db
 from sqlalchemy.sql import text
+from db import db
+
 
 def get_thread_messages(thread_id: int):
     messages = db.session.execute(text(
@@ -19,11 +20,16 @@ def get_thread_messages(thread_id: int):
 
     return messages
 
+
 def create_message(user_id: int, thread_id: int, message: str):
-    db.session.execute(text("INSERT INTO messages (user_id, thread_id, message) VALUES (:user_id, :thread_id, :message)"), {
-            "user_id": user_id,
-            "thread_id": thread_id,
-            "message": message  
-        })
-    
+    db.session.execute(text(
+        """
+        INSERT INTO messages (user_id, thread_id, message) 
+        VALUES (:user_id, :thread_id, :message)
+        """), {
+        "user_id": user_id,
+        "thread_id": thread_id,
+        "message": message
+    })
+
     db.session.commit()

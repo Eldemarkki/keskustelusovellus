@@ -12,6 +12,7 @@ from users import create_user, get_user_by_id, get_user_by_username, user_exists
 
 hasher = PasswordHasher()
 
+
 @app.route("/")
 def index_page():
     user_id = session.get("id")
@@ -23,9 +24,11 @@ def index_page():
             return render_template("index.html", username=username, active_threads=active_threads)
     return render_template("index.html")
 
+
 @app.route("/register")
 def register_page():
     return render_template("register.html")
+
 
 @app.post('/register')
 def register_post():
@@ -34,7 +37,8 @@ def register_post():
 
     errors = []
     if not re.match("^[a-zA-Z0-9]{1,32}$", username):
-        errors.append("Käyttäjänimessä täytyy olla ainoastaan alfanumeerisia merkkejä (a-z, A-Z, 0-9) ja olla 1-32 merkkiä pitkä.")
+        errors.append(
+            "Käyttäjänimessä täytyy olla ainoastaan alfanumeerisia merkkejä (a-z, A-Z, 0-9) ja olla 1-32 merkkiä pitkä.")
     if len(password) < 16 or len(password) > 64:
         errors.append("Salasanan täytyy olla 16-64 merkkiä pitkä.")
     username_exists = user_exists(username)
@@ -49,9 +53,11 @@ def register_post():
         session["id"] = user_id
         return redirect("/")
 
+
 @app.route("/login")
 def login_page():
     return render_template("login.html")
+
 
 @app.post('/login')
 def login_post():
@@ -74,21 +80,24 @@ def login_post():
             return redirect("/")
         else:
             # Try to verify some garbage to prevent timing attacks.
-            password_hash = "$argon2id$v=19$m=65536,t=3,p=4$nQiaw9HH5UxmV44rZk7yMA$0wBr3cHpcfSqyZMQvYCsNv4ywkMxbgIUpS4+TtFmWQ4" # testing1234567890
+            password_hash = "$argon2id$v=19$m=65536,t=3,p=4$nQiaw9HH5UxmV44rZk7yMA$0wBr3cHpcfSqyZMQvYCsNv4ywkMxbgIUpS4+TtFmWQ4"  # testing1234567890
             hasher.verify(password_hash, "incorrect")
     except VerificationError:
         return render_template("login.html", errors=["Virheellinen käyttäjänimi tai salasana"])
+
 
 @app.post("/logout")
 def logout_post():
     del session["id"]
     return redirect("/")
 
+
 @app.route("/new-topic")
 def new_topic_route():
     if "id" in session:
         return render_template("/new_topic.html")
     return redirect("/login")
+
 
 @app.post("/new-topic")
 def new_topic_post():
@@ -97,8 +106,9 @@ def new_topic_post():
 
         name = request.form.get("name", "")
         if not re.match("^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$", name):
-            errors.append("Aiheen nimessä tulee olla ainoastaan alfanumeerisia merkkejä (a-z, A-Z, 0-9) eikä siinä saa olla peräkkäisiä välilyöntejä.")
-        
+            errors.append(
+                "Aiheen nimessä tulee olla ainoastaan alfanumeerisia merkkejä (a-z, A-Z, 0-9) eikä siinä saa olla peräkkäisiä välilyöntejä.")
+
         if len(name) <= 0 or len(name) > 100:
             errors.append("Aiheen nimeen tulee olla 1-100 merkkiä pitkä.")
 
@@ -118,6 +128,7 @@ def new_topic_post():
 
     return redirect("/login")
 
+
 @app.route("/topics/<topic_slug>")
 def topic_page(topic_slug):
     user_id = session.get("id")
@@ -128,8 +139,9 @@ def topic_page(topic_slug):
 
         if topic is not None:
             return render_template("topic.html", topic=topic, threads=threads)
-    
+
     abort(404)
+
 
 @app.route("/topics/<topic_slug>/new-thread")
 def new_thread_page(topic_slug):
@@ -142,6 +154,7 @@ def new_thread_page(topic_slug):
 
         return render_template("/new_thread.html", topic=topic)
     return redirect("/login")
+
 
 @app.post("/topics/<topic_slug>/new-thread")
 def new_thread_post(topic_slug):
@@ -171,13 +184,15 @@ def new_thread_post(topic_slug):
         return redirect("/threads/" + str(thread_id))
     return redirect("/login")
 
+
 @app.route("/topics")
 def topics_route():
     user_id = session.get("id")
-    
+
     topics = get_topics(user_id)
 
     return render_template("topics.html", topics=topics)
+
 
 def render_thread_page(thread_id, error=None, is_participants_open=False):
     thread = get_thread_by_id(thread_id)
@@ -185,7 +200,7 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
     if thread is None:
         abort(404)
         return
-    
+
     user_id = session.get("id")
     if thread.private and not has_access_to_private_thread(thread_id, user_id):
         abort(404)
@@ -196,14 +211,15 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
     messages = get_thread_messages(thread.id)
     thread_owner = get_thread_owner_id(thread.id)
     show_participant_list = thread_owner == user_id
-    private_thread_participants = get_private_thread_participants(thread.id, user_id)
+    private_thread_participants = get_private_thread_participants(
+        thread.id, user_id)
 
     follows_thread = check_follows_thread(thread.id, user_id)
 
     update_read_time(thread.id, user_id)
 
     return render_template(
-        "thread.html", 
+        "thread.html",
         thread=thread,
         messages=messages,
         topic=topic,
@@ -214,22 +230,24 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
         follows_thread=follows_thread
     )
 
+
 @app.route("/threads/<thread_id>")
 def thread_route(thread_id):
     return render_thread_page(thread_id)
+
 
 @app.post("/threads/<thread_id>")
 def thread_post(thread_id):
     user_id = session.get("id")
     if user_id is None:
         return redirect("/login")
-    
+
     thread = get_thread_by_id(thread_id)
 
     if thread is None:
         abort(404)
         return
-    
+
     if thread.private and not has_access_to_private_thread(thread_id, user_id):
         abort(404)
         return
@@ -246,12 +264,13 @@ def thread_post(thread_id):
 
     return redirect("/threads/" + str(thread_id))
 
+
 @app.post("/threads/<thread_id>/add-participant")
 def add_participant_post(thread_id):
     user_id = session.get("id")
     if user_id is None:
         return redirect("/login")
-    
+
     thread = get_thread_by_id(thread_id)
     if thread is None:
         print("thread not found")
@@ -261,7 +280,7 @@ def add_participant_post(thread_id):
     if not thread.private:
         abort(403)
         return
-    
+
     thread_owner = get_thread_owner_id(thread_id)
 
     if thread_owner != user_id:
@@ -273,10 +292,11 @@ def add_participant_post(thread_id):
 
     if new_participant is None:
         return render_thread_page(thread_id=thread_id, error="Käyttäjää ei löytynyt", is_participants_open=True)
-    
+
     add_access_to_private_thread(thread_id, new_participant.id)
 
     return render_thread_page(thread_id=thread_id, is_participants_open=True)
+
 
 @app.post("/threads/<thread_id>/remove-participant")
 def remove_participant_post(thread_id):
@@ -293,17 +313,18 @@ def remove_participant_post(thread_id):
     if not thread.private:
         abort(403)
         return
-    
+
     thread_owner = get_thread_owner_id(thread_id)
 
     if thread_owner != user_id:
         return redirect("/login")
 
     participant_id = request.form.get("participant-id", type=int)
-    
+
     remove_access_to_private_thread(thread_id, participant_id)
 
     return render_thread_page(thread_id=thread_id, is_participants_open=True)
+
 
 @app.post("/threads/<thread_id>/follow")
 def follow_thread_post(thread_id):
@@ -316,7 +337,7 @@ def follow_thread_post(thread_id):
         print("thread not found")
         abort(404)
         return
-    
+
     user_id = session.get("id")
     if thread.private and not has_access_to_private_thread(thread.id, user_id):
         abort(404)
@@ -326,6 +347,7 @@ def follow_thread_post(thread_id):
         follow_thread(thread.id, user_id)
 
     return redirect("/threads/" + str(thread.id))
+
 
 @app.post("/threads/<thread_id>/unfollow")
 def unfollow_thread_post(thread_id):
@@ -338,7 +360,7 @@ def unfollow_thread_post(thread_id):
         print("thread not found")
         abort(404)
         return
-    
+
     user_id = session.get("id")
     if thread.private and not has_access_to_private_thread(thread.id, user_id):
         abort(404)
@@ -348,6 +370,7 @@ def unfollow_thread_post(thread_id):
         unfollow_thread(thread.id, user_id)
 
     return redirect("/threads/" + str(thread.id))
+
 
 @app.errorhandler(404)
 def page_not_found(_):
