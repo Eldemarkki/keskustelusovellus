@@ -45,8 +45,8 @@
 </head>
 
 <body>
-    <a href="/">Front page</a>
-    <a href="/topics/{{ topic.slug }}">Browse {{ topic.name }}</a>
+    <a href="/">Etusivu</a>
+    <a href="/topics/{{ topic.slug }}">Selaa {{ topic.name }}</a>
     <div class="title">
         {% if thread.private %}
         <img src="/static/lock.svg" width="32" height="32" />
@@ -57,15 +57,15 @@
     <details 
         {% if is_participants_open %}open=''{% endif %}
     >
-        <summary>Private thread participants</summary>
-        <h2>Add new participant</h2>
+        <summary>Yksityisen ketjun osallistujat</summary>
+        <h2>Lisää uusi osallistuja</h2>
         {% if error and error|length > 0 %}
         <p>{{ error }}</p>
         {% endif %}
         <form action="/threads/{{ thread.id }}/add-participant" method="post" class="new-participant-form">
-            <label for="participant-username">Participant username</label>
+            <label for="participant-username">Osallistujan käyttäjänimi</label>
             <input type="text" name="participant-username" autocomplete="off" />
-            <input type="submit" value="Add participant" />
+            <input type="submit" value="Lisää osallistuja" />
         </form>
         <ul class="private-participant-list">
             {% for participant in private_participants %}
@@ -73,7 +73,7 @@
                 <span>{{ participant.username }}</span>
                 <form action="/threads/{{ thread.id }}/remove-participant" method="post">
                     <input type="hidden" name="participant-id" value="{{ participant.user_id }}" />
-                    <input type="submit" value="Remove" />
+                    <input type="submit" value="Poista" />
                 </form>
             </li>
             {% endfor %}
@@ -90,11 +90,11 @@
         <input type="submit" value="Seuraa ketjua" />
     </form>
     {% endif %}
-    <h2>New message</h2>
+    <h2>Uusi viesti</h2>
     <form action="/threads/{{ thread.id }}" method="post" class="message-form">
-        <label for="message">Message</label>
+        <label for="message">Viesti</label>
         <textarea name="message"></textarea>
-        <input type="submit" value="Send message" />
+        <input type="submit" value="Lähetä viesti" />
     </form>
     <ul>
         {% for message in messages %}

@@ -97,17 +97,17 @@ def new_topic_post():
 
         name = request.form.get("name", "")
         if not re.match("^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$", name):
-            errors.append("Topic name must only have alphanumeric characters (a-z, A-Z, 0-9) and no consecutive spaces.")
+            errors.append("Aiheen nimessä tulee olla ainoastaan alfanumeerisia merkkejä (a-z, A-Z, 0-9) eikä siinä saa olla peräkkäisiä välilyöntejä.")
         
         if len(name) <= 0 or len(name) > 100:
-            errors.append("Topic name must be 1-100 characters long.")
+            errors.append("Aiheen nimeen tulee olla 1-100 merkkiä pitkä.")
 
         description = request.form.get("description", None)
         if len(description) > 500:
-            errors.append("Description must not be longer than 500 characters")
+            errors.append("Kuvaus saa olla enintään 500 merkkiä pitkä.")
 
         if topic_exists(name):
-            errors.append("A topic with this name already exists")
+            errors.append("Tämänniminen aihe on jo olemassa.")
 
         if len(errors) > 0:
             return render_template("/new_topic.html", errors=errors)
@@ -261,7 +261,7 @@ def add_participant_post(thread_id):
     new_participant = get_user_by_username(username)
 
     if new_participant is None:
-        return render_thread_page(thread_id=thread_id, error="User not found", is_participants_open=True)
+        return render_thread_page(thread_id=thread_id, error="Käyttäjää ei löytynyt", is_participants_open=True)
     
     add_access_to_private_thread(thread_id, new_participant.id)
 

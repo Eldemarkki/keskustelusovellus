@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New thread to {{ topic.name }}</title>
+    <title>Uusi ketju aiheeseen {{ topic.name }}</title>
     <style>
         form {
             display: grid;
@@ -25,15 +25,15 @@
 </head>
 
 <body>
-    <h1>New thread to {{ topic.name }}</h1>
+    <h1>Uusi ketju aiheeseen {{ topic.name }}</h1>
     <form action="/topics/{{ topic.slug }}/new-thread" method="post">
-        <label for="title">Title</label>
+        <label for="title">Otsikko</label>
         <input id="title" type="text" autocomplete="off" name="title" />
-        <label for="private">Private</label>
+        <label for="private">Yksityinen</label>
         <input id="private" type="checkbox" name="private" />
-        <label for="message">Message</label>
+        <label for="message">Viesti</label>
         <textarea id="message" name="message"></textarea>
-        <input type="submit" value="Create thread" class="submit-button" />
+        <input type="submit" value="Luo ketju" class="submit-button" />
     </form>
 </body>
 

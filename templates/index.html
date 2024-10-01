@@ -7,11 +7,11 @@
 </head>
 <body>
     {% if username %}
-    <p>Welcome back, {{ username }}</p>
+    <p>Tervetuloa takaisin, {{ username }}</p>
     <form method="post" action="/logout">
-        <input type="submit" value="Log out" />
+        <input type="submit" value="Kirjaudu ulos" />
     </form>
-    <a href="/topics">Browse topics</a>
+    <a href="/topics">Selaa aihepiirejä</a>
     {% if active_threads|length > 0 %}
     <ul>
         {% for thread in active_threads %}
@@ -22,8 +22,8 @@
     </ul>
     {% endif %}
     {% else %}
-    <a href="/login">Log in here</a>
-    <a href="/register">Register here</a>
+    <a href="/login">Kirjaudu</a>
+    <a href="/register">Rekisteröidy</a>
     {% endif %}
 </body>
 </html>

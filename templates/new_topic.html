@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New topic</title>
+    <title>Uusi aihepiiri</title>
     <style>
         form {
             display: grid;
@@ -25,20 +25,20 @@
 </head>
 
 <body>
-    <a href="/">Front page</a>
-    <h1>Create new topic</h1>
+    <a href="/">Etusivu</a>
+    <h1>Luo uusi aihepiiri</h1>
     <form action="/new-topic" method="post">
-        <label for="name">Name</label>
+        <label for="name">Nimi</label>
         <input id="name" type="text" name="name" minlength="1" maxlength="100"
             pattern="^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$" required autocomplete="off"
-            placeholder="Star Wars, bouldering, cooking..." />
-        <label for="description">Description</label>
+            placeholder="Star Wars, seinäkiipeily, ruuanlaitto..." />
+        <label for="description">Kuvaus</label>
         <textarea id="description" name="description" maxlength="500"></textarea>
-        <input type="submit" value="Create" class="submit-button" />
+        <input type="submit" value="Luo" class="submit-button" />
     </form>
     {% if errors and errors|length > 0 %}
     <div>
-        <p>The topic couldn't be created due to the following errors:</p>
+        <p>Aihepiiriä ei voitu luoda seuraavien virheiden vuoksi:</p>
         <ul>
             {% for error in errors %}
             <li>{{ error }}</li>
