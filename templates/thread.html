@@ -93,7 +93,7 @@
     <h2>Uusi viesti</h2>
     <form action="/threads/{{ thread.id }}" method="post" class="message-form">
         <label for="message">Viesti</label>
-        <textarea name="message"></textarea>
+        <textarea name="message" required minlength="1" maxlength="500"></textarea>
         <input type="submit" value="Lähetä viesti" />
     </form>
     <ul>

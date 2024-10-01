@@ -150,6 +150,12 @@ def new_thread_post(topic_slug):
         title = request.form.get("title", "")
         private = request.form.get("private", False, type=bool)
         message = request.form.get("message", "")
+
+        if len(message) <= 0 or len(message) > 500:
+            # This should never happen because we have frontend validation, so no need to create a pretty error page.
+            abort(400)
+            return
+
         topic = get_topic_by_slug(topic_slug)
 
         if topic is None:
@@ -229,6 +235,11 @@ def thread_post(thread_id):
         return
 
     message = request.form.get("message", "")
+
+    if len(message) <= 0 or len(message) > 500:
+        # This should never happen because we have frontend validation, so no need to create a pretty error page.
+        abort(400)
+        return
 
     create_message(user_id, thread_id, message)
     update_read_time(thread_id, user_id)
