@@ -34,8 +34,8 @@ def get_topic_by_slug(slug):
 def get_topics(user_id):
     topics = db.session.execute(text(
         """
-        SELECT name, slug, COUNT(
-                CASE
+        SELECT name, slug, COUNT( 
+                DISTINCT CASE
                     WHEN private = false OR private_thread_participant_rights.user_id = :user_id 
                     THEN threads.id
                 END
