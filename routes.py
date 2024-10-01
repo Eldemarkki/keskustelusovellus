@@ -6,7 +6,7 @@ from app import app
 from messages import create_message, get_thread_messages
 from private_thread_participant_rights import add_access_to_private_thread, get_private_thread_participants, has_access_to_private_thread, remove_access_to_private_thread
 from thread_followers import check_follows_thread, follow_thread, unfollow_thread
-from threads import create_thread, get_thread_by_id, get_thread_owner_id, get_topic_threads
+from threads import create_thread, get_thread_by_id, get_thread_owner_id, get_topic_threads, get_followed_thread_activity, update_read_time
 from topics import create_topic, get_topic_by_id, get_topic_by_slug, get_topics, topic_exists
 from users import create_user, get_user_by_id, get_user_by_username, user_exists
 
@@ -19,7 +19,8 @@ def index_page():
         user = get_user_by_id(user_id)
         if user is not None:
             username = user[0]
-            return render_template("index.html", username=username)
+            active_threads = get_followed_thread_activity(user_id)
+            return render_template("index.html", username=username, active_threads=active_threads)
     return render_template("index.html")
 
 @app.route("/register")
@@ -193,6 +194,8 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
 
     follows_thread = check_follows_thread(thread.id, user_id)
 
+    update_read_time(thread.id, user_id)
+
     return render_template(
         "thread.html", 
         thread=thread,
@@ -228,6 +231,7 @@ def thread_post(thread_id):
     message = request.form.get("message", "")
 
     create_message(user_id, thread_id, message)
+    update_read_time(thread_id, user_id)
 
     return redirect("/threads/" + str(thread_id))
 

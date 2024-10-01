@@ -58,3 +58,32 @@ def get_thread_owner_id(thread_id: int) -> int:
     }).first()[0]
 
     return thread_owner
+
+def get_followed_thread_activity(user_id: int):
+    result = db.session.execute(text(
+        """
+        SELECT threads.id, threads.title, COUNT(messages.id) 
+        FROM threads 
+        LEFT JOIN thread_followers ON threads.id = thread_followers.thread_id 
+        LEFT JOIN messages ON threads.id = messages.thread_id 
+        WHERE 
+            messages.created_at > thread_followers.read_time AND 
+            thread_followers.user_id = :user_id
+        GROUP BY threads.id;
+        """
+    ), {
+        "user_id": user_id
+    }).all()
+
+    return result
+
+def update_read_time(thread_id: int, user_id: int):
+    db.session.execute(text(
+        """
+        UPDATE thread_followers SET read_time = NOW() WHERE thread_id = :thread_id AND user_id = :user_id
+        """), {
+            "thread_id": thread_id,
+            "user_id": user_id
+        })
+
+    db.session.commit()
