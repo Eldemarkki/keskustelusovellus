@@ -16,7 +16,7 @@ def get_thread_messages(thread_id: int):
             ORDER BY created_at DESC
         """), {
         "thread_id": thread_id
-    })
+    }).all()
 
     return messages
 

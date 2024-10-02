@@ -9,6 +9,7 @@ from thread_followers import check_follows_thread, follow_thread, unfollow_threa
 from threads import create_thread, get_thread_by_id, get_thread_owner_id, get_topic_threads, get_followed_thread_activity, update_read_time
 from topics import create_topic, get_topic_by_id, get_topic_by_slug, get_topics, topic_exists
 from users import create_user, get_user_by_id, get_user_by_username, user_exists
+from utils import format_date_relative
 
 hasher = PasswordHasher()
 
@@ -214,20 +215,32 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
     private_thread_participants = get_private_thread_participants(
         thread.id, user_id)
 
+    viewer = get_user_by_id(user_id)
+    owner = get_user_by_id(thread_owner)
+
     follows_thread = check_follows_thread(thread.id, user_id)
 
     update_read_time(thread.id, user_id)
 
+    normalized_messages = [{
+        "username": m.username,
+        "created_at": m.created_at,
+        "formatted_date": format_date_relative(m.created_at),
+        "message": m.message
+    } for m in messages]
+
     return render_template(
         "thread.html",
         thread=thread,
-        messages=messages,
+        messages=normalized_messages,
         topic=topic,
         private_participants=private_thread_participants,
         is_participants_open=is_participants_open,
         show_participant_list=show_participant_list,
         error=error,
-        follows_thread=follows_thread
+        follows_thread=follows_thread,
+        viewer_username=viewer.username,
+        owner_username=owner.username
     )
 
 
