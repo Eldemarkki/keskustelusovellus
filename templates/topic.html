@@ -4,32 +4,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/global.css">
     <title>{{ name }}</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 50rem;
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <a href="/">Etusivu</a>
-    <a href="/topics">Aihepiirit</a>
-    <h1>{{ topic.name }}</h1>
-    {% if topic.description and topic.description|length > 0 %}
-    <p>{{ topic.description }}</p>
-    {% endif %}
-    <a href="/topics/{{ topic.slug }}/new-thread">Luo uusi ketju</a>
-    {% if threads|length > 0 %}
-    <h2>Ketjut</h2>
-    <ul>
-        {% for thread in threads %}
-        <li>
-            {% if thread.private %}
-            <img src="/static/lock.svg" width="20" height="20"/>
-            {% endif %}
-            <a href="/threads/{{ thread.id }}">{{ thread.title }} ({{ thread.count }} {{ "viesti" if thread.count == 1 else "viestiä" }})</a>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>Ei ketjuja</p>
-    {% endif %}
+    <div class="container">
+        <a href="/">Etusivu</a>
+        <a href="/topics">Aihepiirit</a>
+        <h1>{{ topic.name }}</h1>
+        {% if topic.description and topic.description|length > 0 %}
+        <p>{{ topic.description }}</p>
+        {% endif %}
+        <a href="/topics/{{ topic.slug }}/new-thread">Luo uusi ketju</a>
+        {% if threads|length > 0 %}
+        <h2>Ketjut</h2>
+        <ul>
+            {% for thread in threads %}
+            <li>
+                {% if thread.private %}
+                <img src="/static/lock.svg" width="20" height="20" />
+                {% endif %}
+                <a href="/threads/{{ thread.id }}">{{ thread.title }} ({{ thread.count }} {{ "viesti" if thread.count ==
+                    1 else "viestiä" }})</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Ei ketjuja</p>
+        {% endif %}
+    </div>
 </body>
 
 </html>

@@ -60,10 +60,10 @@ def get_thread_owner_id(thread_id: int) -> int:
     # Thread owner is whoever sent the first message to this thread
     thread_owner = db.session.execute(text(
         """
-        SELECT user_id 
-        FROM messages 
-        WHERE thread_id = :thread_id 
-        ORDER BY created_at DESC 
+        SELECT user_id
+        FROM messages
+        WHERE thread_id = :thread_id
+        ORDER BY created_at
         LIMIT 1
         """), {
         "thread_id": thread_id

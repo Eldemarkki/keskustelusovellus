@@ -106,9 +106,9 @@ def new_topic_post():
         errors = []
 
         name = request.form.get("name", "")
-        if not re.match("^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$", name):
+        if not re.match("^[a-zA-Z0-9öåäÖÅÄ]+(?: [a-zA-Z0-9öåäÖÅÄ]+)*$", name):
             errors.append(
-                "Aiheen nimessä tulee olla ainoastaan alfanumeerisia merkkejä (a-z, A-Z, 0-9) eikä siinä saa olla peräkkäisiä välilyöntejä.")
+                "Aiheen nimessä tulee olla ainoastaan alfanumeerisia merkkejä (a-ö, A-Ö, 0-9) eikä siinä saa olla peräkkäisiä välilyöntejä.")
 
         if len(name) <= 0 or len(name) > 100:
             errors.append("Aiheen nimeen tulee olla 1-100 merkkiä pitkä.")

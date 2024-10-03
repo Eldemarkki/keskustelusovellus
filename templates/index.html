@@ -1,29 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/global.css">
     <title>Home</title>
+    <style>
+        .anonymous-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .anonymous-container-link {
+            border: 1px solid black;
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+    </style>
 </head>
+
 <body>
     {% if username %}
-    <p>Tervetuloa takaisin, {{ username }}</p>
-    <form method="post" action="/logout">
-        <input type="submit" value="Kirjaudu ulos" />
-    </form>
-    <a href="/topics">Selaa aihepiirejä</a>
-    {% if active_threads|length > 0 %}
-    <ul>
-        {% for thread in active_threads %}
-        <li>
-            <a href="/threads/{{ thread.id }}">{{ thread.title }} (<b>{{ thread.count }} {{ "uusi viesti" if thread.count == 1 else "uutta viestiä" }}</b>)</a>
-        </li>
-        {% endfor %}
-    </ul>
+    <div>
+        <p>Tervetuloa takaisin, {{ username }}</p>
+        <form method="post" action="/logout">
+            <input type="submit" value="Kirjaudu ulos" />
+        </form>
+        <a href="/topics">Selaa aihepiirejä</a>
+        {% if active_threads|length > 0 %}
+        <ul>
+            {% for thread in active_threads %}
+            <li>
+                <a href="/threads/{{ thread.id }}">{{ thread.title }} (<b>{{ thread.count }} {{ "uusi viesti" if
+                        thread.count == 1 else "uutta viestiä" }}</b>)</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endif %}
     {% else %}
-    <a href="/login">Kirjaudu</a>
-    <a href="/register">Rekisteröidy</a>
+    <div class="anonymous-container">
+        <h1>Keskustelusovellus</h1>
+        <a class="anonymous-container-link" href="/login">Kirjaudu</a>
+        <a class="anonymous-container-link" href="/register">Rekisteröidy</a>
+    </div>
     {% endif %}
 </body>
+
 </html>
