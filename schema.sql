@@ -32,7 +32,9 @@ CREATE TABLE messages (
 CREATE TABLE private_thread_participant_rights (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id),
-    thread_id INT NOT NULL REFERENCES threads(id)
+    thread_id INT NOT NULL REFERENCES threads(id),
+
+    UNIQUE (user_id, thread_id)
 );
 
 CREATE TABLE thread_followers (

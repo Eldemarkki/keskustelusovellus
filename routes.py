@@ -165,6 +165,11 @@ def new_thread_post(topic_slug):
         private = request.form.get("private", False, type=bool)
         message = request.form.get("message", "")
 
+        if len(title) <= 0 or len(title) > 100:
+            # This should never happen because we have frontend validation, so no need to create a pretty error page.
+            abort(400)
+            return
+
         if len(message) <= 0 or len(message) > 500:
             # This should never happen because we have frontend validation, so no need to create a pretty error page.
             abort(400)
@@ -305,6 +310,9 @@ def add_participant_post(thread_id):
 
     if new_participant is None:
         return render_thread_page(thread_id=thread_id, error="Käyttäjää ei löytynyt", is_participants_open=True)
+
+    if has_access_to_private_thread(thread_id, new_participant.id):
+        return render_thread_page(thread_id=thread_id, error="Käyttäjällä on jo pääsy tähän ketjuun", is_participants_open=True)
 
     add_access_to_private_thread(thread_id, new_participant.id)
 

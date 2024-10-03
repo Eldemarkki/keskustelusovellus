@@ -37,6 +37,10 @@
             border-radius: 4rem;
             padding: 4rem;
         }
+
+        h1 {
+            word-break: break-word;
+        }
     </style>
 </head>
 
@@ -45,7 +49,7 @@
         <h1>Uusi ketju aiheeseen {{ topic.name }}</h1>
         <form action="/topics/{{ topic.slug }}/new-thread" method="post">
             <label for="title">Otsikko</label>
-            <input id="title" type="text" autocomplete="off" name="title" />
+            <input id="title" type="text" autocomplete="off" name="title" required minlength="1" maxlength="100" />
             <label for="private">Yksityinen</label>
             <input id="private" type="checkbox" name="private" />
             <label for="message">Viesti</label>
