@@ -17,3 +17,7 @@ body {
     max-width: 40rem;
     width: 100%;
 }
+
+.topics-list-item {
+    word-break: break-word;
+}

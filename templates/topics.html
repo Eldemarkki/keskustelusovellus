@@ -10,7 +10,7 @@
     <ul>
         {% for topic in topics %}
         <li>
-            <a href="/topics/{{ topic.slug }}">{{ topic.name }} ({{ topic.count }} {{ "ketju" if topic.count == 1
+            <a href="/topics/{{ topic.slug }}" class="topics-list-item">{{ topic.name }} ({{ topic.count }} {{ "ketju" if topic.count == 1
                 else "ketjua" }})</a>
         </li>
         {% endfor %}
