@@ -8,7 +8,6 @@ Sovelluksessa käyttäjä voi:
 - [X] Lähettää viestejä keskusteluketjuun
 - [X] Luoda yksityisen keskusteluketjun ja määrittää käyttäjät, joilla on pääsy tähän ketjuun
 - [X] Seurata valitsemiaan ketjuja ja nähdä ne ensimmäisenä etusivulla
-- [ ] Poistaa ja muokata viestejä
 
 ## Kehitysympäristö
 
