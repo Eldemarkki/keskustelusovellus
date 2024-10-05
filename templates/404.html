@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/global.css">
-    <title>Sivua ei löytynyt</title>
-</head>
-<body>
-    <h1>Sivua ei löytynyt</h1>
-    <p>Sivua, jota etsit, ei valitettavasti löytynyt.</p>
-</body>
-</html>
+{% extends "layout.html" %}
+{% block title %}Sivua ei löytynyt{% endblock %}
+{% block content %}
+<h1>Sivua ei löytynyt</h1>
+<p>Sivua, jota etsit, ei valitettavasti löytynyt.</p>
+{% endblock %}

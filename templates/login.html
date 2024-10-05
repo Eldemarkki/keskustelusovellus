@@ -1,92 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/global.css">
-    <title>Kirjaudu</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            min-height: 100vh;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .login-container {
-            border: 2px solid black;
-            border-radius: 1rem;
-            padding: 2rem;
-            max-width: 30rem;
-            width: 100%;
-        }
-
-        .form-field {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .submit-button {
-            margin-block-start: 1rem;
-            height: 2rem;
-        }
-
-        .errors-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            background-color: rgb(255, 101, 101);
-            color: black;
-            padding: 1rem;
-        }
-
-        .errors-container p,
-        .errors-container ul {
-            margin: 0;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="login-container">
-        <h1>Kirjaudu</h1>
-        <form method="post" action="/login">
-            <div class="form-field">
-                <label for="username-input">Käyttäjänimi</label>
-                <input id="username-input" name="username" required />
-            </div>
-            <div class="form-field">
-                <label for="password-input">Salasana</label>
-                <input id="password-input" name="password" type="password" required />
-            </div>
-            {% if errors and errors|length > 0 %}
-            <div class="errors-container">
-                <p>Kirjautuminen epäonnistui:</p>
-                <ul>
-                    {% for error in errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-            <input class="submit-button" type="submit" value="Kirjaudu" />
-            <p>Ei vielä käyttäjää? <a href="/register">Luo käyttäjä</a></p>
-        </form>
-    </div>
-</body>
-
-</html>
+{% extends "layout.html" %}
+{% block title %}Kirjaudu{% endblock %}
+{% block pagename %}login{% endblock %}
+{% block content %}
+<div class="login-container">
+    <h1>Kirjaudu</h1>
+    <form method="post" action="/login">
+        <div class="form-field">
+            <label for="username-input">Käyttäjänimi</label>
+            <input id="username-input" name="username" required />
+        </div>
+        <div class="form-field">
+            <label for="password-input">Salasana</label>
+            <input id="password-input" name="password" type="password" required />
+        </div>
+        {% if errors and errors|length > 0 %}
+        <div class="errors-container">
+            <p>Kirjautuminen epäonnistui:</p>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <input class="submit-button" type="submit" value="Kirjaudu" />
+        <p>Ei vielä käyttäjää? <a href="/register">Luo käyttäjä</a></p>
+    </form>
+</div>
+{% endblock %}

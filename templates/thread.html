@@ -1,221 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/global.css">
-    <title>{{ thread.title }}</title>
-    <style>
-        textarea {
-            resize: vertical;
-        }
-
-        h1 {
-            margin: 0
-        }
-
-        .new-participant-form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .message-form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .title {
-            display: flex;
-            align-items: center;
-            margin-block: 1rem;
-        }
-
-        .private-participant-row {
-            display: grid;
-            grid-template-columns: 1fr auto;
-        }
-
-        .private-participant-list {
-            /* max-width: 30rem; */
-            padding: 0;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 60rem;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid black;
-            border-radius: 4rem;
-            padding: 4rem;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        h1 {
-            word-break: break-word;
-        }
-
-        .link-container {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .message-inputs-container {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 0.5rem;
-        }
-
-        .send-message-button {
-            border: none;
-            background: black;
-            color: white;
-            padding-inline: 2rem;
-            font-size: 1em;
-            border-radius: 0.5rem;
-        }
-
-        .message-container {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .message-metadata-container {
-            display: flex;
-            gap: 0.3rem;
-            color: #4e4e4e;
-            font-size: 0.8rem;
-        }
-
-        .message-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            margin-block-start: 1rem;
-        }
-
-        .message-content {
-            word-break: break-word;
-            margin: 0;
-        }
-
-        .new-participant-inputs-container {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 0.5rem;
-        }
-
-        .private-participants-container {
-            margin-block-start: 0.5rem;
-        }
-
-        .errors-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            background-color: rgb(255, 101, 101);
-            color: black;
-            padding: 1rem;
-            margin-block-start: 0.5rem;
-        }
-
-        .errors-container p {
-            margin: 0;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="link-container">
-        <a href="/">Etusivu</a>
-        <a href="/topics/{{ topic.slug }}">Selaa {{ topic.name }}</a>
+{% extends "layout.html" %}
+{% block title %}{{ thread.title }}{% endblock %}
+{% block pagename %}thread{% endblock %}
+{% block content %}
+<div class="link-container">
+    <a href="/">Etusivu</a>
+    <a href="/topics/{{ topic.slug }}">Selaa {{ topic.name }}</a>
+</div>
+<div class="container">
+    <div class="title">
+        {% if thread.private %}
+        <img src="/static/lock.svg" width="32" height="32" />
+        {% endif %}
+        <h1>{{ thread.title }}</h1>
     </div>
-    <div class="container">
-        <div class="title">
-            {% if thread.private %}
-            <img src="/static/lock.svg" width="32" height="32" />
-            {% endif %}
-            <h1>{{ thread.title }}</h1>
-        </div>
-        {% if follows_thread %}
-        <form action="/threads/{{ thread.id }}/unfollow" method="post">
-            <input type="submit" value="Lopeta ketjun seuraaminen" />
-        </form>
-        {% else %}
-        <form action="/threads/{{ thread.id }}/follow" method="post">
-            <input type="submit" value="Seuraa ketjua" />
-        </form>
-        {% endif %}
-        {% if thread.private and show_participant_list %}
-        <details {% if is_participants_open %}open='' {% endif %} class="private-participants-container">
-            <summary>Yksityisen ketjun osallistujat</summary>
-            <h2>Lisää uusi osallistuja</h2>
-            <form action="/threads/{{ thread.id }}/add-participant" method="post" class="new-participant-form">
-                <label for="participant-username">Osallistujan käyttäjänimi</label>
-                <div class="new-participant-inputs-container">
-                    <input id="participant-username" type="text" name="participant-username" autocomplete="off" required />
-                    <input type="submit" value="Lisää osallistuja" />
-                </div>
-                {% if error and error|length > 0 %}
-                <div class="errors-container">
-                    <p>{{ error }}</p>
-                </div>
-                {% endif %}
-            </form>
-            <ul class="private-participant-list">
-                {% for participant in private_participants %}
-                <li class="private-participant-row">
-                    <span>{{ participant.username }}</span>
-                    <form action="/threads/{{ thread.id }}/remove-participant" method="post">
-                        <input type="hidden" name="participant-id" value="{{ participant.user_id }}" />
-                        <input type="submit" value="Poista" />
-                    </form>
-                </li>
-                {% endfor %}
-            </ul>
-            <hr />
-        </details>
-        {% endif %}
-        <h2>Uusi viesti</h2>
-        <form action="/threads/{{ thread.id }}" method="post" class="message-form">
-            <label for="message">Viesti</label>
-            <div class="message-inputs-container">
-                <textarea id="message" name="message" required minlength="1" maxlength="500"></textarea>
-                <input type="submit" value="Lähetä viesti" class="send-message-button" />
+    {% if follows_thread %}
+    <form action="/threads/{{ thread.id }}/unfollow" method="post">
+        <input type="submit" value="Lopeta ketjun seuraaminen" />
+    </form>
+    {% else %}
+    <form action="/threads/{{ thread.id }}/follow" method="post">
+        <input type="submit" value="Seuraa ketjua" />
+    </form>
+    {% endif %}
+    {% if thread.private and show_participant_list %}
+    <details {% if is_participants_open %}open='' {% endif %} class="private-participants-container">
+        <summary>Yksityisen ketjun osallistujat</summary>
+        <h2>Lisää uusi osallistuja</h2>
+        <form action="/threads/{{ thread.id }}/add-participant" method="post" class="new-participant-form">
+            <label for="participant-username">Osallistujan käyttäjänimi</label>
+            <div class="new-participant-inputs-container">
+                <input id="participant-username" type="text" name="participant-username" autocomplete="off" required />
+                <input type="submit" value="Lisää osallistuja" />
             </div>
+            {% if error and error|length > 0 %}
+            <div class="errors-container">
+                <p>{{ error }}</p>
+            </div>
+            {% endif %}
         </form>
-        <ul class="message-list">
-            {% for message in messages %}
-            <li class="message-container">
-                <div class="message-metadata-container">
-                    {% if message.username == viewer_username %}
-                    <b>{{ message.username }}{{" ⭐" if message.username == owner_username else ""}}</b>
-                    {% else %}
-                    <span>{{ message.username }}{{" ⭐" if message.username == owner_username else ""}}</span>
-                    {% endif %}
-                    <span>|</span>
-                    <time datetime="{{message.created_at}}"
-                        title="{{message.created_at}}">{{message.formatted_date}}</time>
-                </div>
-                <p class="message-content">{{message.message}}</p>
+        <ul class="private-participant-list">
+            {% for participant in private_participants %}
+            <li class="private-participant-row">
+                <span>{{ participant.username }}</span>
+                <form action="/threads/{{ thread.id }}/remove-participant" method="post">
+                    <input type="hidden" name="participant-id" value="{{ participant.user_id }}" />
+                    <input type="submit" value="Poista" />
+                </form>
             </li>
             {% endfor %}
         </ul>
-    </div>
-
-</body>
-
-</html>
+        <hr />
+    </details>
+    {% endif %}
+    <h2>Uusi viesti</h2>
+    <form action="/threads/{{ thread.id }}" method="post" class="message-form">
+        <label for="message">Viesti</label>
+        <div class="message-inputs-container">
+            <textarea id="message" name="message" required minlength="1" maxlength="500"></textarea>
+            <input type="submit" value="Lähetä viesti" class="send-message-button" />
+        </div>
+    </form>
+    <ul class="message-list">
+        {% for message in messages %}
+        <li class="message-container">
+            <div class="message-metadata-container">
+                {% if message.username == viewer_username %}
+                <b>{{ message.username }}{{" ⭐" if message.username == owner_username else ""}}</b>
+                {% else %}
+                <span>{{ message.username }}{{" ⭐" if message.username == owner_username else ""}}</span>
+                {% endif %}
+                <span>|</span>
+                <time datetime="{{message.created_at}}" title="{{message.created_at}}">{{message.formatted_date}}</time>
+            </div>
+            <p class="message-content">{{message.message}}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

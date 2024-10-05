@@ -1,73 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/global.css">
-    <title>Uusi aihepiiri</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            gap: 1rem;
-        }
-
-        form {
-            display: grid;
-            grid-template-rows: repeat(3, auto);
-            grid-template-columns: auto 1fr;
-            gap: 0.5rem 1rem;
-        }
-
-        textarea {
-            resize: vertical;
-        }
-
-        .submit-button {
-            grid-column: 1 / span 2;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            padding: 4rem;
-            border: 1px solid black;
-            border-radius: 4rem;
-            max-width: 40rem;
-            width: 100%;
-        }
-    </style>
-</head>
-
-<body>
-    <a href="/">Etusivu</a>
-    <div class="container">
-        <h1>Luo uusi aihepiiri</h1>
-        <form action="/new-topic" method="post">
-            <label for="name">Nimi</label>
-            <input id="name" type="text" name="name" minlength="1" maxlength="100"
-                pattern="^[a-zA-Z0-9öåäÖÅÄ]+(?: [a-zA-Z0-9öåäÖÅÄ]+)*$" required autocomplete="off"
-                placeholder="Star Wars, seinäkiipeily, ruuanlaitto..." />
-            <label for="description">Kuvaus</label>
-            <textarea id="description" name="description" maxlength="500"></textarea>
-            <input type="submit" value="Luo" class="submit-button" />
-        </form>
-        {% if errors and errors|length > 0 %}
-        <div>
-            <p>Aihepiiriä ei voitu luoda seuraavien virheiden vuoksi:</p>
-            <ul>
-                {% for error in errors %}
-                <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+{% extends "layout.html" %}
+{% block title %}Uusi aihepiiri{% endblock %}
+{% block pagename %}new_topic{% endblock %}
+{% block content %}
+<a href="/">Etusivu</a>
+<div class="container">
+    <h1>Luo uusi aihepiiri</h1>
+    <form action="/new-topic" method="post">
+        <label for="name">Nimi</label>
+        <input id="name" type="text" name="name" minlength="1" maxlength="100"
+            pattern="^[a-zA-Z0-9öåäÖÅÄ]+(?: [a-zA-Z0-9öåäÖÅÄ]+)*$" required autocomplete="off"
+            placeholder="Star Wars, seinäkiipeily, ruuanlaitto..." />
+        <label for="description">Kuvaus</label>
+        <textarea id="description" name="description" maxlength="500"></textarea>
+        <input type="submit" value="Luo" class="submit-button" />
+    </form>
+    {% if errors and errors|length > 0 %}
+    <div>
+        <p>Aihepiiriä ei voitu luoda seuraavien virheiden vuoksi:</p>
+        <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
     </div>
-</body>
-
-</html>
+    {% endif %}
+</div>
+{% endblock %}
