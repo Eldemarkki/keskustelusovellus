@@ -26,6 +26,10 @@ body {
     margin: 0;
 }
 
+textarea {
+    resize: vertical;
+}
+
 .primary-button {
     background-color: black;
     color: white;
