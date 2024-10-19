@@ -4,11 +4,13 @@
 {% block content %}
 {% if username %}
 <div>
+    <h1>Keskustelusovellus</h1>
     <p>Tervetuloa takaisin, {{ username }}</p>
     <form method="post" action="/logout">
         <input type="submit" value="Kirjaudu ulos" />
     </form>
     <a href="/topics">Selaa aihepiirejä</a>
+    <h2>Seuratut ketjut</h2>
     {% if active_threads|length > 0 %}
     <ul>
         {% for thread in active_threads %}
@@ -18,6 +20,8 @@
         </li>
         {% endfor %}
     </ul>
+    {% else %}
+    <p>Ei uusia viestejä</p>
 </div>
 {% endif %}
 {% else %}
