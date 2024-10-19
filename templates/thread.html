@@ -15,12 +15,18 @@
     </div>
     {% if follows_thread %}
     <form action="/threads/{{ thread.id }}/unfollow" method="post">
-        <input type="submit" value="Lopeta ketjun seuraaminen" class="secondary-button compact-button" />
+        <button type="submit" class="secondary-button compact-button">
+            <img src="/static/bookmark_filled.svg" width="16" height="16" />
+            Lopeta ketjun seuraaminen
+        </button>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     </form>
     {% else %}
     <form action="/threads/{{ thread.id }}/follow" method="post">
-        <input type="submit" value="Seuraa ketjua" class="secondary-button compact-button" />
+        <button type="submit" class="secondary-button compact-button">
+            <img src="/static/bookmark.svg" width="16" height="16" />
+            Seuraa ketjua
+        </button>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     </form>
     {% endif %}
@@ -32,7 +38,10 @@
             <label for="participant-username">Osallistujan käyttäjänimi</label>
             <div class="new-participant-inputs-container">
                 <input id="participant-username" type="text" name="participant-username" autocomplete="off" required />
-                <input type="submit" value="Lisää osallistuja" class="secondary-button compact-button" />
+                <button type="submit" class="secondary-button compact-button">
+                    <img src="/static/plus.svg" width="16" height="16" />
+                    Lisää osallistuja
+                </button>
             </div>
             {% if error and error|length > 0 %}
             <div class="errors-container">
@@ -47,7 +56,11 @@
                 <span>{{ participant.username }}</span>
                 <form action="/threads/{{ thread.id }}/remove-participant" method="post">
                     <input type="hidden" name="participant-id" value="{{ participant.user_id }}" />
-                    <input type="submit" value="Poista" class="secondary-button compact-button" />
+                    <button type="submit" class="secondary-button compact-button delete-participant-button">
+                        <img src="/static/trash.svg" width="16" height="16" />
+                        Poista
+                    </button>
+                    <!-- <input type="submit" class="secondary-button compact-button"> -->
                     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                 </form>
             </li>
@@ -62,7 +75,10 @@
         <div class="message-inputs-container">
             <textarea id="message" name="message" required minlength="1" maxlength="500"></textarea>
             <div>
-                <input type="submit" value="Lähetä viesti" class="primary-button" />
+                <button type="submit" class="primary-button">
+                    <img src="/static/send.svg" width="16" height="16" />
+                    Lähetä viesti
+                </button>
             </div>
         </div>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">

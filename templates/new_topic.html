@@ -12,7 +12,10 @@
             placeholder="Star Wars, seinäkiipeily, ruuanlaitto..." />
         <label for="description">Kuvaus</label>
         <textarea id="description" name="description" maxlength="500"></textarea>
-        <input type="submit" value="Luo" class="submit-button primary-button" />
+        <button type="submit" class="submit-button primary-button">
+            <img src="/static/plus_white.svg" width="16" height="16" />
+            Luo aihepiiri
+        </button>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     </form>
     {% if errors and errors|length > 0 %}

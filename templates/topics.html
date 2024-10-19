@@ -5,12 +5,16 @@
 <a href="/">Etusivu</a>
 <div class="container">
     <h1>Aihepiirit</h1>
-    <a class="primary-button" href="/new-topic">Luo uusi aihepiiri</a>
+    <a class="primary-button" href="/new-topic">
+        <img src="/static/plus_white.svg" width="16" height="16" />
+        Luo uusi aihepiiri
+    </a>
     {% if topics|length > 0 %}
     <ul>
         {% for topic in topics %}
         <li>
-            <a href="/topics/{{ topic.slug }}" class="topics-list-item">{{ topic.name }} ({{ topic.count }} {{ "ketju" if topic.count == 1
+            <a href="/topics/{{ topic.slug }}" class="topics-list-item">{{ topic.name }} ({{ topic.count }} {{ "ketju"
+                if topic.count == 1
                 else "ketjua" }})</a>
         </li>
         {% endfor %}

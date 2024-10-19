@@ -31,8 +31,3 @@ form {
     margin-block-start: 1rem;
     view-transition-name: login-button;
 }
-
-.errors-container p,
-.errors-container ul {
-    margin: 0;
-}

@@ -67,15 +67,6 @@ h1 {
     gap: 0.5rem;
 }
 
-.send-message-button {
-    border: none;
-    background: black;
-    color: white;
-    padding-inline: 2rem;
-    font-size: 1em;
-    border-radius: 0.5rem;
-}
-
 .message-container {
     display: flex;
     flex-direction: column;
@@ -114,10 +105,5 @@ h1 {
 }
 
 .errors-container {
-
     margin-block-start: 0.5rem;
-}
-
-.errors-container p {
-    margin: 0;
 }

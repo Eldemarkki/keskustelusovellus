@@ -31,6 +31,10 @@
 
 .primary-button,
 .secondary-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
     transition-duration: 200ms;
     border-radius: var(--button-border-radius);
 }
@@ -60,4 +64,9 @@
     border-inline-start: 6px solid var(--error-container-border-color);
     color: black;
     padding: 1rem;
+}
+
+.errors-container p,
+.errors-container ul {
+    margin: 0;
 }

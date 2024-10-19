@@ -7,7 +7,10 @@
     <h1>Keskustelusovellus</h1>
     <p>Tervetuloa, {{ username }}</p>
     <form method="post" action="/logout">
-        <input class="secondary-button compact-button" type="submit" value="Kirjaudu ulos" />
+        <button class="secondary-button compact-button" type="submit">
+            <img src="/static/logout.svg" width="16" height="16" />
+            Kirjaudu ulos
+        </button>
     </form>
     <a href="/topics">Selaa aihepiirejä</a>
     <h2>Seuratut ketjut</h2>

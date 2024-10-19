@@ -11,7 +11,10 @@
     {% endif %}
     <div class="threads-title-container">
         <h2>Ketjut</h2>
-        <a class="primary-button compact-button" href="/topics/{{ topic.slug }}/new-thread">Luo uusi ketju</a>
+        <a class="primary-button compact-button" href="/topics/{{ topic.slug }}/new-thread">
+            <img src="/static/plus_white.svg" width="16" height="16" />
+            Luo uusi ketju
+        </a>
     </div>
     {% if threads|length > 0 %}
     <ul>
