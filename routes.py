@@ -1,4 +1,5 @@
 import re
+import secrets
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from flask import abort, redirect, render_template, request, session
@@ -16,6 +17,8 @@ hasher = PasswordHasher()
 
 @app.route("/")
 def index_page():
+    session["csrf_token"] = secrets.token_hex(16)
+
     user_id = session.get("id")
     if user_id is not None:
         user = get_user_by_id(user_id)
@@ -96,12 +99,17 @@ def logout_post():
 @app.route("/new-topic")
 def new_topic_route():
     if "id" in session:
+        session["csrf_token"] = secrets.token_hex(16)
         return render_template("/new_topic.html")
     return redirect("/login")
 
 
 @app.post("/new-topic")
 def new_topic_post():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    session["csrf_token"] = secrets.token_hex(16)
+
     if "id" in session:
         errors = []
 
@@ -139,6 +147,7 @@ def topic_page(topic_slug):
         threads = get_topic_threads(topic.id, user_id)
 
         if topic is not None:
+            session["csrf_token"] = secrets.token_hex(16)
             return render_template("topic.html", topic=topic, threads=threads)
 
     abort(404)
@@ -153,12 +162,17 @@ def new_thread_page(topic_slug):
             abort(404)
             return
 
+        session["csrf_token"] = secrets.token_hex(16)
         return render_template("/new_thread.html", topic=topic)
     return redirect("/login")
 
 
 @app.post("/topics/<topic_slug>/new-thread")
 def new_thread_post(topic_slug):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    session["csrf_token"] = secrets.token_hex(16)
+
     if "id" in session:
         user_id = session.get("id")
         title = request.form.get("title", "")
@@ -197,6 +211,7 @@ def topics_route():
 
     topics = get_topics(user_id)
 
+    session["csrf_token"] = secrets.token_hex(16)
     return render_template("topics.html", topics=topics)
 
 
@@ -234,6 +249,8 @@ def render_thread_page(thread_id, error=None, is_participants_open=False):
         "message": m.message
     } for m in messages]
 
+    session["csrf_token"] = secrets.token_hex(16)
+
     return render_template(
         "thread.html",
         thread=thread,
@@ -256,6 +273,10 @@ def thread_route(thread_id):
 
 @app.post("/threads/<thread_id>")
 def thread_post(thread_id):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    session["csrf_token"] = secrets.token_hex(16)
+
     user_id = session.get("id")
     if user_id is None:
         return redirect("/login")
@@ -285,6 +306,10 @@ def thread_post(thread_id):
 
 @app.post("/threads/<thread_id>/add-participant")
 def add_participant_post(thread_id):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    session["csrf_token"] = secrets.token_hex(16)
+
     user_id = session.get("id")
     if user_id is None:
         return redirect("/login")
@@ -321,6 +346,10 @@ def add_participant_post(thread_id):
 
 @app.post("/threads/<thread_id>/remove-participant")
 def remove_participant_post(thread_id):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    session["csrf_token"] = secrets.token_hex(16)
+
     user_id = session.get("id")
     if user_id is None:
         return redirect("/login")
@@ -349,6 +378,10 @@ def remove_participant_post(thread_id):
 
 @app.post("/threads/<thread_id>/follow")
 def follow_thread_post(thread_id):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    session["csrf_token"] = secrets.token_hex(16)
+
     user_id = session.get("id")
     if user_id is None:
         return redirect("/login")
@@ -372,6 +405,10 @@ def follow_thread_post(thread_id):
 
 @app.post("/threads/<thread_id>/unfollow")
 def unfollow_thread_post(thread_id):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    session["csrf_token"] = secrets.token_hex(16)
+
     user_id = session.get("id")
     if user_id is None:
         return redirect("/login")
