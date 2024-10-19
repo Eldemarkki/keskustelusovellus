@@ -13,6 +13,10 @@
             <label for="password-input">Salasana</label>
             <input id="password-input" name="password" type="password" minlength="16" maxlength="64" required />
         </div>
+        <div class="form-field">
+            <label for="password-confirm-input">Kirjoita salasana uudelleen</label>
+            <input id="password-confirm-input" name="password-confirm" type="password" minlength="16" maxlength="64" required />
+        </div>
         {% if errors and errors|length > 0 %}
         <div class="errors-container">
             <p>Rekisteröityminen epäonnistui:</p>

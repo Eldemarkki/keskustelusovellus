@@ -38,6 +38,7 @@ def register_page():
 def register_post():
     username = request.form.get('username', '')
     password = request.form.get('password', '')
+    password_confirmation = request.form.get('password-confirm', '')
 
     errors = []
     if not re.match("^[a-zA-Z0-9]{1,32}$", username):
@@ -45,6 +46,9 @@ def register_post():
             "Käyttäjänimessä täytyy olla ainoastaan alfanumeerisia merkkejä (a-z, A-Z, 0-9) ja olla 1-32 merkkiä pitkä.")
     if len(password) < 16 or len(password) > 64:
         errors.append("Salasanan täytyy olla 16-64 merkkiä pitkä.")
+    if password != password_confirmation:
+        errors.append("Salasanat eivät täsmää")
+
     username_exists = user_exists(username)
     if username_exists:
         errors.append("Käyttäjänimi on varattu.")
