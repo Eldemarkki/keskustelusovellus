@@ -5,10 +5,12 @@
     align-items: stretch;
 }
 
-.anonymous-container-link {
-    border: 1px solid black;
-    padding: 1rem 2rem;
-    text-align: center;
+.login-button {
+    view-transition-name: login-button;
+}
+
+.register-button {
+    view-transition-name: register-button;
 }
 
 body {

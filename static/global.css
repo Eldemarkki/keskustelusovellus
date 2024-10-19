@@ -1,3 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+@view-transition {
+    navigation: auto;
+}
+
+:root {
+    --button-border-radius: 8px;
+    --container-border-width: 2px;
+    --error-container-color: rgb(255, 173, 173);
+    --error-container-border-color: rgb(255, 101, 101);
+}
+
 * {
     box-sizing: border-box;
+    font-family: "Open Sans", sans-serif;
+}
+
+.primary-button {
+    background-color: black;
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+.secondary-button {
+    background-color: transparent;
+    color: black;
+    border: 1px solid gray;
+}
+
+.primary-button,
+.secondary-button {
+    transition-duration: 200ms;
+    border-radius: var(--button-border-radius);
+}
+
+.primary-button:not(.compact-button),
+.secondary-button:not(.compact-button) {
+    font-size: 0.9rem;
+    padding: 1rem 2rem;
+}
+
+
+.compact-button {
+    font-size: 0.9rem;
+    padding: 0.3rem 1.3rem;
+}
+
+.primary-button:hover,
+.secondary-button:hover {
+    transform: translateY(-2px);
+}
+
+.errors-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background-color: var(--error-container-color);
+    border-inline-start: 6px solid var(--error-container-border-color);
+    color: black;
+    padding: 1rem;
 }

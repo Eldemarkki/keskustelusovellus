@@ -27,7 +27,7 @@ textarea {
     display: flex;
     flex-direction: column;
     padding: 4rem;
-    border: 1px solid black;
+    border: var(--container-border-width) solid black;
     border-radius: 4rem;
     max-width: 40rem;
     width: 100%;

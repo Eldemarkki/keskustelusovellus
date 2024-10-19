@@ -5,9 +5,9 @@
 {% if username %}
 <div>
     <h1>Keskustelusovellus</h1>
-    <p>Tervetuloa takaisin, {{ username }}</p>
+    <p>Tervetuloa, {{ username }}</p>
     <form method="post" action="/logout">
-        <input type="submit" value="Kirjaudu ulos" />
+        <input class="secondary-button compact-button" type="submit" value="Kirjaudu ulos" />
     </form>
     <a href="/topics">Selaa aihepiirejä</a>
     <h2>Seuratut ketjut</h2>
@@ -27,8 +27,8 @@
 {% else %}
 <div class="anonymous-container">
     <h1>Keskustelusovellus</h1>
-    <a class="anonymous-container-link" href="/login">Kirjaudu</a>
-    <a class="anonymous-container-link" href="/register">Rekisteröidy</a>
+    <a class="login-button primary-button" href="/login">Kirjaudu</a>
+    <a class="register-button secondary-button" href="/register">Rekisteröidy</a>
 </div>
 {% endif %}
 {% endblock %}

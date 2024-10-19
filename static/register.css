@@ -15,7 +15,7 @@ form {
 }
 
 .registration-container {
-    border: 2px solid black;
+    border: var(--container-border-width) solid black;
     border-radius: 1rem;
     padding: 2rem;
     max-width: 30rem;
@@ -29,16 +29,7 @@ form {
 
 .submit-button {
     margin-block-start: 1rem;
-    height: 2rem;
-}
-
-.errors-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    background-color: rgb(255, 101, 101);
-    color: black;
-    padding: 1rem;
+    view-transition-name: register-button;
 }
 
 .errors-container p,

@@ -9,9 +9,11 @@
     {% if topic.description and topic.description|length > 0 %}
     <p>{{ topic.description }}</p>
     {% endif %}
-    <a href="/topics/{{ topic.slug }}/new-thread">Luo uusi ketju</a>
+    <div class="threads-title-container">
+        <h2>Ketjut</h2>
+        <a class="primary-button compact-button" href="/topics/{{ topic.slug }}/new-thread">Luo uusi ketju</a>
+    </div>
     {% if threads|length > 0 %}
-    <h2>Ketjut</h2>
     <ul>
         {% for thread in threads %}
         <li>

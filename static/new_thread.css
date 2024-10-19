@@ -24,7 +24,7 @@ textarea {
 .container {
     max-width: 40rem;
     width: 100%;
-    border: 1px solid black;
+    border: var(--container-border-width) solid black;
     border-radius: 4rem;
     padding: 4rem;
 }

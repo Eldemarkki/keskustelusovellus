@@ -11,7 +11,7 @@
         <input id="private" type="checkbox" name="private" />
         <label for="message">Viesti</label>
         <textarea id="message" name="message" required minlength="1" maxlength="500"></textarea>
-        <input type="submit" value="Luo ketju" class="submit-button" />
+        <input type="submit" value="Luo ketju" class="submit-button primary-button" />
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     </form>
 </div>

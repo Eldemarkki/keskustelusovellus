@@ -13,3 +13,12 @@ body {
 h1 {
     word-break: break-word;
 }
+
+h2 {
+    margin: 0;
+}
+
+.threads-title-container {
+    display: flex;
+    justify-content: space-between;
+}
