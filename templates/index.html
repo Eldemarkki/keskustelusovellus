@@ -3,7 +3,7 @@
 {% block pagename %}index{% endblock %}
 {% block content %}
 {% if username %}
-<div>
+<div class="page-container">
     <h1>Keskustelusovellus</h1>
     <p>Tervetuloa, {{ username }}</p>
     <form method="post" action="/logout">
