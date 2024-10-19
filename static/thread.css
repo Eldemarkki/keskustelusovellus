@@ -5,6 +5,7 @@ textarea {
 h1 {
     margin: 0;
     view-transition-name: thread-name;
+    word-break: break-word;
 }
 
 .new-participant-form {
@@ -30,35 +31,6 @@ h1 {
 
 .private-participant-list {
     padding: 0;
-}
-
-.container {
-    width: 100%;
-    max-width: 60rem;
-    display: flex;
-    flex-direction: column;
-    border: var(--container-border-width) solid black;
-    border-radius: 4rem;
-    padding: 4rem;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    min-height: 100vh;
-    margin: 0;
-}
-
-h1 {
-    word-break: break-word;
-}
-
-.link-container {
-    display: flex;
-    gap: 1rem;
 }
 
 .message-inputs-container {

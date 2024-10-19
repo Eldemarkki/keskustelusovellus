@@ -2,9 +2,11 @@
 {% block title %}{{ name }}{% endblock %}
 {% block pagename %}topic{% endblock %}
 {% block content %}
-<div class="container">
+<div class="link-container">
     <a href="/">Etusivu</a>
     <a href="/topics">Aihepiirit</a>
+</div>
+<div class="page-container">
     <h1>{{ topic.name }}</h1>
     {% if topic.description and topic.description|length > 0 %}
     <p>{{ topic.description }}</p>

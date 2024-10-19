@@ -2,8 +2,10 @@
 {% block title %}Uusi aihepiiri{% endblock %}
 {% block pagename %}new_topic{% endblock %}
 {% block content %}
-<a href="/">Etusivu</a>
-<div class="container">
+<div class="link-container">
+    <a href="/">Etusivu</a>
+</div>
+<div class="page-container">
     <h1>Luo uusi aihepiiri</h1>
     <form action="/new-topic" method="post">
         <label for="name">Nimi</label>

@@ -13,13 +13,6 @@
     view-transition-name: register-button;
 }
 
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-}
-
 form {
     margin-block-end: 0.5rem;
 }

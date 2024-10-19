@@ -2,7 +2,11 @@
 {% block title %}Uusi ketju aiheeseen {{ topic.name }}{% endblock %}
 {% block pagename %}new_thread{% endblock %}
 {% block content %}
-<div class="container">
+<div class="link-container">
+    <a href="/">Etusivu</a>
+    <a href="/topics/{{ topic.slug }}">Selaa {{ topic.name }}</a>
+</div>
+<div class="page-container">
     <h1>Uusi ketju aiheeseen {{ topic.name }}</h1>
     <form action="/topics/{{ topic.slug }}/new-thread" method="post">
         <label for="title">Otsikko</label>
